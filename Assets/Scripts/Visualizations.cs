@@ -148,8 +148,24 @@ public class Visualizations : MonoBehaviour {
         lastPoint = go.transform.position;
         lastTimestamp = packet.TimestampMS;
 
+        ElevationViz(go);
         GForceViz(packet, go, frameTick);
         SuspensionTravelMeshColourViz(packet, go);
+    }
+
+    void ElevationViz (GameObject go)
+    {
+        LineRenderer line = go.AddComponent<LineRenderer>();
+        line.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+        line.receiveShadows = false;
+        line.useWorldSpace = true;
+        line.startWidth = 0.005f;
+        line.startColor = Color.grey;
+        line.endWidth = 0.005f;
+        line.endColor = Color.grey;
+        line.material = (Material)Resources.Load("Elevation Line", typeof(Material));
+        line.SetPosition(0, go.transform.position);
+        line.SetPosition(1, new Vector3(go.transform.position.x, 0, go.transform.position.z));
     }
 
     void GForceViz (ForzaPacket packet, GameObject go, float frameTick)

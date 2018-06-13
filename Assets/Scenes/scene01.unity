@@ -394,7 +394,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f51bc9becbc8095419411a7cc4c65f77, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cameraFollowPosition: {x: 0, y: 2, z: -5}
+  cameraFollowPosition: {x: -1, y: 2, z: -5}
 --- !u!1 &1826372308
 GameObject:
   m_ObjectHideFlags: 0
