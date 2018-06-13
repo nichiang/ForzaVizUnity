@@ -218,7 +218,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d12cef058e15548468ff36e675dd8bb7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  carPrefab: {fileID: 1596733638980608, guid: 82ab2b08af0e8cd45995dc7c15471fca, type: 2}
+  carVisualizationType: 2
+  genericCarPrefab: {fileID: 1991486745234664, guid: 4289d6fc7e87ecd44bdb14b6d90b1e21,
+    type: 2}
+  suspensionVizCarPrefab: {fileID: 1596733638980608, guid: 82ab2b08af0e8cd45995dc7c15471fca,
+    type: 2}
+  gforceVizCarPrefab: {fileID: 1726220038883692, guid: 572519c5bae238645a4b87d381384dac,
+    type: 2}
   suspensionGradient:
     serializedVersion: 2
     key0: {r: 0.27205884, g: 1, b: 0.9397566, a: 1}
@@ -248,6 +254,7 @@ MonoBehaviour:
     m_Mode: 0
     m_NumColorKeys: 3
     m_NumAlphaKeys: 2
+  mainCamera: {fileID: 1415663439}
 --- !u!1001 &1321721719
 Prefab:
   m_ObjectHideFlags: 0
@@ -305,6 +312,7 @@ GameObject:
   - component: {fileID: 1415663437}
   - component: {fileID: 1415663436}
   - component: {fileID: 1415663435}
+  - component: {fileID: 1415663439}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -375,6 +383,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1415663439
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1415663434}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f51bc9becbc8095419411a7cc4c65f77, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cameraFollowPosition: {x: 0, y: 2, z: -5}
 --- !u!1 &1826372308
 GameObject:
   m_ObjectHideFlags: 0

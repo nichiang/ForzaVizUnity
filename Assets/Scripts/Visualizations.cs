@@ -5,14 +5,38 @@ using UnityEngine;
 
 public class Visualizations : MonoBehaviour {
 
-    public GameObject carPrefab;
+    public enum CarVizType
+    {
+        Generic,
+        SuspensionViz,
+        GForce
+    };
+
+    private enum MeshTopVertex
+    {
+        FrontLeft = 0,
+        FrontRight = 1,
+        RearLeft = 2,
+        RearRight = 3,
+        Center = 4,
+        FrontCenter = 5,
+        RearCenter = 6,
+        LeftCenter = 7,
+        RightCenter = 8
+    };
+
+    public CarVizType carVisualizationType = CarVizType.Generic;
+
+    public GameObject genericCarPrefab;
+    public GameObject suspensionVizCarPrefab;
+    public GameObject gforceVizCarPrefab;
 
     public Gradient suspensionGradient;
 
+    public MainCamera mainCamera;
+
     private Vector3 lastPoint;
     private UInt32 lastTimestamp = 0;
-
-    enum MeshTopVertex { FrontLeft = 0, FrontRight = 1, RearLeft = 2, RearRight = 3, Center = 4, FrontCenter = 5, RearCenter = 6, LeftCenter = 7, RightCenter = 8 };
 
     private Dictionary<MeshTopVertex, int[]> meshTopVertices;
 
@@ -83,6 +107,18 @@ public class Visualizations : MonoBehaviour {
 
         // Setting car position
 
+        GameObject carPrefab = genericCarPrefab;
+
+        switch (carVisualizationType)
+        {
+            case CarVizType.SuspensionViz:
+                carPrefab = suspensionVizCarPrefab;
+                break;
+            case CarVizType.GForce:
+                carPrefab = gforceVizCarPrefab;
+                break;
+        }
+
         GameObject go = Instantiate(carPrefab);
         go.transform.SetParent(this.transform);
         go.transform.position = lastPoint;
@@ -107,9 +143,35 @@ public class Visualizations : MonoBehaviour {
             Space.Self
         );
 
+        mainCamera.FollowCurrentPoint(go);
+
         lastPoint = go.transform.position;
         lastTimestamp = packet.TimestampMS;
 
+        GForceViz(packet, go, frameTick);
+        SuspensionTravelMeshColourViz(packet, go);
+    }
+
+    void GForceViz (ForzaPacket packet, GameObject go, float frameTick)
+    {
+        if (carVisualizationType != CarVizType.GForce)
+            return;
+
+        Transform arrow = go.transform.GetChild(0);
+
+        arrow.transform.forward = new Vector3(packet.AccelerationX, packet.AccelerationY, packet.AccelerationZ);
+
+        float gforce = (float)Math.Sqrt(Math.Pow(packet.AccelerationX, 2) + Math.Pow(packet.AccelerationY, 2) + Math.Pow(packet.AccelerationZ, 2)) / 9.80665f;
+
+        Vector3 scaleArrow = arrow.transform.localScale;
+        scaleArrow.z *= gforce;
+        arrow.transform.localScale = scaleArrow;
+    }
+
+    void SuspensionTravelMeshColourViz (ForzaPacket packet, GameObject go)
+    {
+        if (carVisualizationType != CarVizType.SuspensionViz)
+            return;
         
         // Setting mesh colours
 
@@ -131,7 +193,7 @@ public class Visualizations : MonoBehaviour {
 
         // Setting suspension tilt
 
-        Vector3[] vertices = (Vector3[]) carMesh.vertices.Clone();
+        Vector3[] vertices = (Vector3[])carMesh.vertices.Clone();
 
         vertices = SetVertexHeight(vertices, MeshTopVertex.FrontLeft, 1f - packet.NormalizedSuspensionTravelFrontLeft * 0.75f);
         vertices = SetVertexHeight(vertices, MeshTopVertex.FrontRight, 1f - packet.NormalizedSuspensionTravelFrontRight * 0.75f);
