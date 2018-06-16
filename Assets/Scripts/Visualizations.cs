@@ -27,9 +27,14 @@ public class Visualizations : MonoBehaviour {
 
     public CarVizType carVisualizationType = CarVizType.Generic;
 
+    public bool ShowElevation = true;
+    public bool ShowSuspensionTravel = true;
+
     public GameObject genericTrailPrefab;
     public GameObject suspensionVizCarPrefab;
     public GameObject gforceVizCarPrefab;
+
+    public GameObject FLTire, FRTire, RLTire, RRTire;
 
     public Gradient suspensionGradient;
 
@@ -144,6 +149,9 @@ public class Visualizations : MonoBehaviour {
             Space.Self
         );
 
+        if (!ShowElevation)
+            go.transform.position = new Vector3(go.transform.position.x, 0, go.transform.position.z);
+
         mainCamera.FollowCurrentPoint(go);
 
         lastGo = go;
@@ -153,6 +161,9 @@ public class Visualizations : MonoBehaviour {
         ElevationViz(go);
         GForceViz(packet, go, frameTick);
         SuspensionTravelMeshColourViz(packet, go);
+
+        if (ShowSuspensionTravel)
+            SuspensionTravelTireViz(packet);
     }
 
     void ElevationViz (GameObject go)
@@ -186,6 +197,24 @@ public class Visualizations : MonoBehaviour {
         Vector3 scaleArrow = arrow.transform.localScale;
         scaleArrow.z *= gforce;
         arrow.transform.localScale = scaleArrow;
+    }
+
+    void SuspensionTravelTireViz (ForzaPacket packet)
+    {
+        if (mainCamera.IsFollowing())
+        {
+            FLTire.transform.localPosition = new Vector3(FLTire.transform.localPosition.x, 3.2f + packet.NormalizedSuspensionTravelFrontLeft * 0.4f, FLTire.transform.localPosition.z);
+            FRTire.transform.localPosition = new Vector3(FRTire.transform.localPosition.x, 3.2f + packet.NormalizedSuspensionTravelFrontRight * 0.4f, FRTire.transform.localPosition.z);
+            RLTire.transform.localPosition = new Vector3(RLTire.transform.localPosition.x, 3.2f + packet.NormalizedSuspensionTravelRearLeft * 0.4f, RLTire.transform.localPosition.z);
+            RRTire.transform.localPosition = new Vector3(RRTire.transform.localPosition.x, 3.2f + packet.NormalizedSuspensionTravelRearRight * 0.4f, RRTire.transform.localPosition.z);
+        }
+        else
+        {
+            FLTire.transform.localPosition = new Vector3(FLTire.transform.localPosition.x, 3.2f, FLTire.transform.localPosition.z);
+            FRTire.transform.localPosition = new Vector3(FRTire.transform.localPosition.x, 3.2f, FRTire.transform.localPosition.z);
+            RLTire.transform.localPosition = new Vector3(RLTire.transform.localPosition.x, 3.2f, RLTire.transform.localPosition.z);
+            RRTire.transform.localPosition = new Vector3(RRTire.transform.localPosition.x, 3.2f, RRTire.transform.localPosition.z);
+        }
     }
 
     void SuspensionTravelMeshColourViz (ForzaPacket packet, GameObject go)

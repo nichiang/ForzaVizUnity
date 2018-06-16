@@ -26,6 +26,8 @@ public class MainCamera : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+
+        // Go backwards
 		if (Input.GetKey(KeyCode.DownArrow))
         {
             if (currentTarget != null)
@@ -47,6 +49,8 @@ public class MainCamera : MonoBehaviour {
                 else if (prevStepCount > 400) stepThroughMultiplier = 8;
             }
         }
+
+        // Go forward
         else if (Input.GetKey(KeyCode.UpArrow))
         {
             if (currentTarget != null)
@@ -68,10 +72,14 @@ public class MainCamera : MonoBehaviour {
                 else if (nextStepCount > 400) stepThroughMultiplier = 8;
             }
         }
+
+        // Toggle follow mode
         else if (Input.GetKeyDown(KeyCode.Space))
         {
             followMode = !followMode;
         }
+
+        // Go to first position
         else if (Input.GetKeyDown(KeyCode.Alpha1))
         {
             followMode = false;
@@ -83,6 +91,14 @@ public class MainCamera : MonoBehaviour {
             nextStepCount = 0;
             stepThroughMultiplier = 1;
         }
+
+        // Reset camera orientation and zoom
+        else if (Input.GetKeyDown(KeyCode.R))
+        {
+            mainCamera.transform.parent.localEulerAngles = cameraFollowPosition;
+            mainCamera.fieldOfView = 60f;
+        }
+
         else
         {
             prevStepCount = 0;
@@ -90,6 +106,7 @@ public class MainCamera : MonoBehaviour {
             stepThroughMultiplier = 1;
         }
 
+        // Camera zoom
         if (Input.mouseScrollDelta != Vector2.zero)
         {
             float fov = mainCamera.fieldOfView;
@@ -99,11 +116,11 @@ public class MainCamera : MonoBehaviour {
             mainCamera.fieldOfView = fov;
         }
 
+        // Orbit camera
         if (Input.GetMouseButtonDown(1))
         {
             lastMousePosition = Input.mousePosition;
         }
-
         if (Input.GetMouseButton(1))
         {
             Transform gimbal = transform.parent;
@@ -120,6 +137,11 @@ public class MainCamera : MonoBehaviour {
 
             lastMousePosition = Input.mousePosition;
         }
+    }
+
+    public bool IsFollowing()
+    {
+        return followMode;
     }
 
     public void FollowCurrentPoint (GameObject go, bool force = false, Direction dir = Direction.forward)
