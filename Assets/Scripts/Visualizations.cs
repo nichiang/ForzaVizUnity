@@ -27,7 +27,7 @@ public class Visualizations : MonoBehaviour {
 
     public CarVizType carVisualizationType = CarVizType.Generic;
 
-    public GameObject genericCarPrefab;
+    public GameObject genericTrailPrefab;
     public GameObject suspensionVizCarPrefab;
     public GameObject gforceVizCarPrefab;
 
@@ -35,6 +35,7 @@ public class Visualizations : MonoBehaviour {
 
     public MainCamera mainCamera;
 
+    private GameObject lastGo;
     private Vector3 lastPoint;
     private UInt32 lastTimestamp = 0;
 
@@ -107,7 +108,7 @@ public class Visualizations : MonoBehaviour {
 
         // Setting car position
 
-        GameObject carPrefab = genericCarPrefab;
+        GameObject carPrefab = genericTrailPrefab;
 
         switch (carVisualizationType)
         {
@@ -145,6 +146,7 @@ public class Visualizations : MonoBehaviour {
 
         mainCamera.FollowCurrentPoint(go);
 
+        lastGo = go;
         lastPoint = go.transform.position;
         lastTimestamp = packet.TimestampMS;
 
@@ -175,9 +177,11 @@ public class Visualizations : MonoBehaviour {
 
         Transform arrow = go.transform.GetChild(0);
 
-        arrow.transform.forward = new Vector3(packet.AccelerationX, packet.AccelerationY, packet.AccelerationZ);
+        Vector3 accelVector = new Vector3(packet.AccelerationX, packet.AccelerationY, packet.AccelerationZ);
 
-        float gforce = (float)Math.Sqrt(Math.Pow(packet.AccelerationX, 2) + Math.Pow(packet.AccelerationY, 2) + Math.Pow(packet.AccelerationZ, 2)) / 9.80665f;
+        arrow.transform.forward = accelVector;
+
+        float gforce = accelVector.magnitude / 9.80665f;
 
         Vector3 scaleArrow = arrow.transform.localScale;
         scaleArrow.z *= gforce;
