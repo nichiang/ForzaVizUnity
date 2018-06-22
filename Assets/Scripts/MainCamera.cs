@@ -176,6 +176,12 @@ public class MainCamera : MonoBehaviour {
         }
     }
 
+    public void GoToPoint (GameObject go)
+    {
+        followMode = false;
+        FollowCurrentPoint(go, true, Direction.forward);
+    }
+
     void DrawGenericCar (Transform t)
     {
         genericCar.transform.position = t.position;

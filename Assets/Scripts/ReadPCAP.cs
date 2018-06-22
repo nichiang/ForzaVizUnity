@@ -13,7 +13,8 @@ public class ReadPCAP : MonoBehaviour {
 
     private ConcurrentQueue<ForzaPacket> packetQueue;
     private int packetCount = 0;
-
+    private bool listenForPackets = true;
+    
     // Use this for initialization
 	async void Start () {
         packetQueue = new ConcurrentQueue<ForzaPacket>();
@@ -24,14 +25,16 @@ public class ReadPCAP : MonoBehaviour {
 
         await Task.Delay(TimeSpan.FromMilliseconds(1000));
 
-        while (true)
+        while (listenForPackets)
         {
             ForzaPacket packet;
 
             if (packetQueue.TryDequeue(out packet))
             {
                 if (visualizations)
+                {
                     visualizations.DrawCar(packet);
+                }
             }
             else
             {
@@ -46,6 +49,15 @@ public class ReadPCAP : MonoBehaviour {
 
         Debug.Log("Packet queue watcher stopped");
 	}
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            listenForPackets = false;
+            Debug.Log("Packet queue watcher stopped by user");
+        }
+    }
 
     void ListenPackets()
     {

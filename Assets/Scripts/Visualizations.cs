@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DigitalRuby.FastLineRenderer;
 
 public class Visualizations : MonoBehaviour {
 
@@ -28,6 +29,8 @@ public class Visualizations : MonoBehaviour {
     public CarVizType carVisualizationType = CarVizType.Generic;
 
     public bool ShowElevation = true;
+    public FastLineRenderer elevationRenderer;
+
     public bool ShowSuspensionTravel = true;
 
     public GameObject genericTrailPrefab;
@@ -36,9 +39,12 @@ public class Visualizations : MonoBehaviour {
 
     public GameObject FLTire, FRTire, RLTire, RRTire;
 
+    public Graph FLGraph, FRGraph, RLGraph, RRGraph;
+
     public Gradient suspensionGradient;
 
     public MainCamera mainCamera;
+    public TrackInfo trackInfo;
 
     private GameObject lastGo;
     private Vector3 lastPoint;
@@ -98,6 +104,7 @@ public class Visualizations : MonoBehaviour {
         31  -0.5, 0.5, 0.4999999		// Front Left
         32  0.4999999, 0.5, 0.5			// Front Right
         */
+        
     }
 
     public void DrawCar (ForzaPacket packet)
@@ -152,22 +159,36 @@ public class Visualizations : MonoBehaviour {
         if (!ShowElevation)
             go.transform.position = new Vector3(go.transform.position.x, 0, go.transform.position.z);
 
-        mainCamera.FollowCurrentPoint(go);
+        if (mainCamera.IsFollowing())
+            mainCamera.FollowCurrentPoint(go);
 
         lastGo = go;
         lastPoint = go.transform.position;
         lastTimestamp = packet.TimestampMS;
 
+        trackInfo.FindLap(go);
+
         ElevationViz(go);
         GForceViz(packet, go, frameTick);
         SuspensionTravelMeshColourViz(packet, go);
+
+        NormalizedSuspensionGraph(packet);
 
         if (ShowSuspensionTravel)
             SuspensionTravelTireViz(packet);
     }
 
+    void NormalizedSuspensionGraph (ForzaPacket packet)
+    {
+        FLGraph.AddPoint(1f - packet.NormalizedSuspensionTravelFrontLeft);
+        FRGraph.AddPoint(1f - packet.NormalizedSuspensionTravelFrontRight);
+        RLGraph.AddPoint(1f - packet.NormalizedSuspensionTravelRearLeft);
+        RRGraph.AddPoint(1f - packet.NormalizedSuspensionTravelRearRight);
+    }
+
     void ElevationViz (GameObject go)
     {
+        /*
         LineRenderer line = go.AddComponent<LineRenderer>();
         line.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         line.receiveShadows = false;
@@ -179,6 +200,18 @@ public class Visualizations : MonoBehaviour {
         line.material = (Material)Resources.Load("Elevation Line", typeof(Material));
         line.SetPosition(0, go.transform.position);
         line.SetPosition(1, new Vector3(go.transform.position.x, 0, go.transform.position.z));
+        */
+
+        FastLineRendererProperties elevationRendererProps = new FastLineRendererProperties
+        {
+            Start = go.transform.position,
+            End = new Vector3(go.transform.position.x, 0, go.transform.position.z),
+            Radius = 0.0075f,
+            Color = new Color(0.243f, 0.259f, 0.294f)
+        };
+
+        elevationRenderer.AddLine(elevationRendererProps);
+        elevationRenderer.Apply();
     }
 
     void GForceViz (ForzaPacket packet, GameObject go, float frameTick)
@@ -293,5 +326,10 @@ public class Visualizations : MonoBehaviour {
         vertices = SetVertexHeight(vertices, MeshTopVertex.Center, centerHeight);
 
         return vertices;
+    }
+
+    public GameObject CurrentPoint ()
+    {
+        return lastGo;
     }
 }
