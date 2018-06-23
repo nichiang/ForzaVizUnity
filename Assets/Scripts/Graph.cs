@@ -20,14 +20,14 @@ public class Graph : MonoBehaviour {
         for (int i = 0; i < visiblePointsCount; i++)
         {
             dataPoints.Enqueue(0);
-            lineRenderer.SetPosition(i, new Vector3(i * pointOffset, 0, 0));
+            lineRenderer.SetPosition(i, new Vector3(i * pointOffset - 0.5f, 0, 0));
         }
     }
 	
 	// Update is called once per frame
 	void Update () {
-		
-	}
+        this.transform.forward = Camera.main.transform.forward;
+    }
 
     public void AddPoint(float point)
     {
@@ -40,10 +40,10 @@ public class Graph : MonoBehaviour {
 
         Queue<float>.Enumerator pointsEnum = dataPoints.GetEnumerator();
 
-        for (int i = 0; i < visiblePointsCount; i++)
+        for (int i = visiblePointsCount - 1; i >= 0; i--)
         {
             pointsEnum.MoveNext();
-            Vector3 newPoint = new Vector3(1f - i * pointOffset, pointsEnum.Current, 0);
+            Vector3 newPoint = new Vector3(0.5f - i * pointOffset, pointsEnum.Current - 0.5f, 0);
             lineRenderer.SetPosition(i, newPoint);
         }
     }

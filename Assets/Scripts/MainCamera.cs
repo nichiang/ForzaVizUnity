@@ -28,7 +28,7 @@ public class MainCamera : MonoBehaviour {
 	void Update () {
 
         // Go backwards
-		if (Input.GetKey(KeyCode.DownArrow))
+		if (Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S))
         {
             if (currentTarget != null)
             {
@@ -51,7 +51,7 @@ public class MainCamera : MonoBehaviour {
         }
 
         // Go forward
-        else if (Input.GetKey(KeyCode.UpArrow))
+        else if (Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W))
         {
             if (currentTarget != null)
             {
@@ -166,11 +166,8 @@ public class MainCamera : MonoBehaviour {
                 }
             }
 
-            //t.position = go.transform.TransformPoint(cameraFollowPosition);
-            //t.position = go.transform.position + cameraFollowPosition;
-            //transform.LookAt(go.transform);
-
-            DrawGenericCar(go.transform);
+            genericCar.transform.position = go.transform.position;
+            genericCar.transform.rotation = go.transform.rotation;
 
             currentTarget = go;
         }
@@ -180,11 +177,5 @@ public class MainCamera : MonoBehaviour {
     {
         followMode = false;
         FollowCurrentPoint(go, true, Direction.forward);
-    }
-
-    void DrawGenericCar (Transform t)
-    {
-        genericCar.transform.position = t.position;
-        genericCar.transform.rotation = t.rotation;
     }
 }

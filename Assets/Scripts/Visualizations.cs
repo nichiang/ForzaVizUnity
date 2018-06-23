@@ -6,7 +6,7 @@ using DigitalRuby.FastLineRenderer;
 
 public class Visualizations : MonoBehaviour {
 
-    public enum CarVizType
+    public enum TrailVizType
     {
         Generic,
         SuspensionViz,
@@ -26,25 +26,39 @@ public class Visualizations : MonoBehaviour {
         RightCenter = 8
     };
 
-    public CarVizType carVisualizationType = CarVizType.Generic;
+    public TrailVizType trailVisualizationType = TrailVizType.Generic;
+    public Transform dataRoot;
 
+    [Header("Elevation")]
     public bool ShowElevation = true;
     public FastLineRenderer elevationRenderer;
 
+    [Header("Suspension Travel")]
     public bool ShowSuspensionTravel = true;
-
-    public GameObject genericTrailPrefab;
-    public GameObject suspensionVizCarPrefab;
-    public GameObject gforceVizCarPrefab;
-
-    public GameObject FLTire, FRTire, RLTire, RRTire;
-
-    public Graph FLGraph, FRGraph, RLGraph, RRGraph;
-
     public Gradient suspensionGradient;
 
-    public MainCamera mainCamera;
-    public TrackInfo trackInfo;
+    [Header("G Force")]
+    public Gradient gForceGradient;
+
+    [Header("Trail Visualization Prefabs")]
+    public GameObject genericTrailPrefab;
+    public GameObject suspensionVizTrailPrefab;
+    public GameObject gforceVizTrailPrefab;
+    
+    [Header("Tire References")]
+    public GameObject FLTire;
+    public GameObject FRTire;
+    public GameObject RLTire;
+    public GameObject RRTire;
+
+    [Header("Graph References")]
+    public Graph FLGraph;
+    public Graph FRGraph;
+    public Graph RLGraph;
+    public Graph RRGraph;
+    
+    private MainCamera mainCamera;
+    private TrackInfo trackInfo;
 
     private GameObject lastGo;
     private Vector3 lastPoint;
@@ -54,6 +68,9 @@ public class Visualizations : MonoBehaviour {
 
     void Start ()
     {
+        mainCamera = Camera.main.GetComponent<MainCamera>();
+        trackInfo = GetComponent<TrackInfo>();
+
         meshTopVertices = new Dictionary<MeshTopVertex, int[]>
         {
             { MeshTopVertex.FrontLeft, new int[] { 4, 15, 31 } },
@@ -66,45 +83,6 @@ public class Visualizations : MonoBehaviour {
             { MeshTopVertex.LeftCenter, new int[] { 16, 26 } },
             { MeshTopVertex.RightCenter, new int[] { 6, 27 } }
         };
-
-        /*
-        Mesh vertices
-
-        0   0.4999999, 0.5, 0.5			// Front Right
-        1   -4.371139E-08, 0.5, 0.5		// Front Center
-        2   0.5, -0.4999999, 0.5
-        3   -0.5, -0.5, 0.5
-        4   -0.5, 0.5, 0.4999999		// Front Left
-        5   0.5, 0.5, -0.5				// Rear Right
-        6   0.5, 0.5, 2.185569E-08		// Right Center
-        7   0.5, -0.5, -0.4999999
-        8   0.5, -0.4999999, 0.5
-        9   0.4999999, 0.5, 0.5			// Front Right
-        10  -0.5, 0.4999999, -0.5		// Rear Left
-        11  -1.776357E-15, 0.5, -0.5	// Rear Center
-        12  -0.4999999, -0.5, -0.5
-        13  0.5, -0.5, -0.4999999
-        14  0.5, 0.5, -0.5				// Rear Right
-        15  -0.5, 0.5, 0.4999999		// Front Left
-        16  -0.5, 0.5, -2.185569E-08	// Left Center
-        17  -0.5, -0.5, 0.5
-        18  -0.4999999, -0.5, -0.5
-        19  -0.5, 0.4999999, -0.5		// Rear Left
-        20  0.5, -0.4999999, 0.5
-        21  -0.5, -0.5, 0.5
-        22  -0.4999999, -0.5, -0.5
-        23  0.5, -0.5, -0.4999999
-        24  -4.371139E-08, 0.5, 0.5		// Front Center
-        25  -2.18557E-08, 0.5, 0        // Center
-        26  -0.5, 0.5, -2.185569E-08	// Left Center
-        27  0.5, 0.5, 2.185569E-08		// Right Center
-        28  -1.776357E-15, 0.5, -0.5	// Rear Center
-        29  -0.5, 0.4999999, -0.5		// Rear Left
-        30  0.5, 0.5, -0.5				// Rear Right
-        31  -0.5, 0.5, 0.4999999		// Front Left
-        32  0.4999999, 0.5, 0.5			// Front Right
-        */
-        
     }
 
     public void DrawCar (ForzaPacket packet)
@@ -120,32 +98,21 @@ public class Visualizations : MonoBehaviour {
 
         // Setting car position
 
-        GameObject carPrefab = genericTrailPrefab;
+        GameObject trailPrefab = genericTrailPrefab;
 
-        switch (carVisualizationType)
+        switch (trailVisualizationType)
         {
-            case CarVizType.SuspensionViz:
-                carPrefab = suspensionVizCarPrefab;
+            case TrailVizType.SuspensionViz:
+                trailPrefab = suspensionVizTrailPrefab;
                 break;
-            case CarVizType.GForce:
-                carPrefab = gforceVizCarPrefab;
+            case TrailVizType.GForce:
+                trailPrefab = gforceVizTrailPrefab;
                 break;
         }
 
-        GameObject go = Instantiate(carPrefab);
-        go.transform.SetParent(this.transform);
+        GameObject go = Instantiate(trailPrefab);
+        go.transform.SetParent(dataRoot);
         go.transform.position = lastPoint;
-
-        /*
-        Using yaw, pitch, roll below gives better results, less prone to floating point rounding issues
-
-        go.transform.Rotate(
-            Mathf.Rad2Deg * packet.AngularVelocityX * frameTick,
-            Mathf.Rad2Deg * packet.AngularVelocityY * frameTick,
-            Mathf.Rad2Deg * packet.AngularVelocityZ * frameTick,
-            Space.Self
-        );
-        */
 
         go.transform.eulerAngles = new Vector3(Mathf.Rad2Deg * packet.Pitch, Mathf.Rad2Deg * packet.Yaw, Mathf.Rad2Deg * packet.Roll);
 
@@ -188,26 +155,12 @@ public class Visualizations : MonoBehaviour {
 
     void ElevationViz (GameObject go)
     {
-        /*
-        LineRenderer line = go.AddComponent<LineRenderer>();
-        line.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-        line.receiveShadows = false;
-        line.useWorldSpace = true;
-        line.startWidth = 0.005f;
-        line.startColor = Color.grey;
-        line.endWidth = 0.005f;
-        line.endColor = Color.grey;
-        line.material = (Material)Resources.Load("Elevation Line", typeof(Material));
-        line.SetPosition(0, go.transform.position);
-        line.SetPosition(1, new Vector3(go.transform.position.x, 0, go.transform.position.z));
-        */
-
         FastLineRendererProperties elevationRendererProps = new FastLineRendererProperties
         {
             Start = go.transform.position,
             End = new Vector3(go.transform.position.x, 0, go.transform.position.z),
             Radius = 0.0075f,
-            Color = new Color(0.243f, 0.259f, 0.294f)
+            Color = new Color(0.165f, 0.173f, 0.2f)
         };
 
         elevationRenderer.AddLine(elevationRendererProps);
@@ -216,7 +169,7 @@ public class Visualizations : MonoBehaviour {
 
     void GForceViz (ForzaPacket packet, GameObject go, float frameTick)
     {
-        if (carVisualizationType != CarVizType.GForce)
+        if (trailVisualizationType != TrailVizType.GForce)
             return;
 
         Transform arrow = go.transform.GetChild(0);
@@ -226,6 +179,8 @@ public class Visualizations : MonoBehaviour {
         arrow.transform.forward = accelVector;
 
         float gforce = accelVector.magnitude / 9.80665f;
+
+        arrow.GetComponent<MeshRenderer>().material.color = gForceGradient.Evaluate(gforce);
 
         Vector3 scaleArrow = arrow.transform.localScale;
         scaleArrow.z *= gforce;
@@ -252,7 +207,7 @@ public class Visualizations : MonoBehaviour {
 
     void SuspensionTravelMeshColourViz (ForzaPacket packet, GameObject go)
     {
-        if (carVisualizationType != CarVizType.SuspensionViz)
+        if (trailVisualizationType != TrailVizType.SuspensionViz)
             return;
         
         // Setting mesh colours

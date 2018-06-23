@@ -11,6 +11,7 @@ public class ReadPCAP : MonoBehaviour {
     public int listenPort = 51384;
     public Visualizations visualizations;
 
+    private UdpClient receivingUdpClient;
     private ConcurrentQueue<ForzaPacket> packetQueue;
     private int packetCount = 0;
     private bool listenForPackets = true;
@@ -31,6 +32,8 @@ public class ReadPCAP : MonoBehaviour {
 
             if (packetQueue.TryDequeue(out packet))
             {
+                DataPoints.AddPoint(packet);
+
                 if (visualizations)
                 {
                     visualizations.DrawCar(packet);
@@ -47,6 +50,8 @@ public class ReadPCAP : MonoBehaviour {
             }
         }
 
+        receivingUdpClient.Close();
+
         Debug.Log("Packet queue watcher stopped");
 	}
 
@@ -61,9 +66,9 @@ public class ReadPCAP : MonoBehaviour {
 
     void ListenPackets()
     {
-        UdpClient receivingUdpClient = new UdpClient(listenPort);
+        receivingUdpClient = new UdpClient(listenPort);
         IPEndPoint RemoteIpEndPoint = new IPEndPoint(IPAddress.Any, 0);
-
+        
         bool recordRace = true;
         bool raceStarted = false;
 
@@ -177,5 +182,10 @@ public class ReadPCAP : MonoBehaviour {
         }
 
         Debug.Log("UDP listener stopped. Final packet count: " + packetCount);
+    }
+
+    void OnDestroy ()
+    {
+        listenForPackets = false;
     }
 }

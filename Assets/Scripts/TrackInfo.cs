@@ -5,9 +5,9 @@ using UnityEngine;
 public class TrackInfo : MonoBehaviour {
 
     public Visualizations visualizations;
-    public MainCamera mainCamera;
     public float searchDistance = 20f;
 
+    private MainCamera mainCamera;
     private Transform dataPointsRoot;
     private List<GameObject> lapStartingPoints;
 
@@ -17,6 +17,7 @@ public class TrackInfo : MonoBehaviour {
 
     void Start ()
     {
+        mainCamera = Camera.main.GetComponent<MainCamera>();
         lapStartingPoints = new List<GameObject>();
         dataPointsRoot = visualizations.gameObject.transform;
     }
