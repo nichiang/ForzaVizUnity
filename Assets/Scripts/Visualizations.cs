@@ -36,6 +36,7 @@ public class Visualizations : MonoBehaviour {
     [Header("Suspension Travel")]
     public bool ShowSuspensionTravel = true;
     public Gradient suspensionGradient;
+    public int suspensionGraphVisiblePoints = 20;
 
     [Header("G Force")]
     public Gradient gForceGradient;
@@ -85,7 +86,7 @@ public class Visualizations : MonoBehaviour {
         };
     }
 
-    public void DrawCar (ForzaPacket packet)
+    public void DrawTrail (ForzaPacket packet)
     {
         if (lastTimestamp == 0)
         {
@@ -110,13 +111,13 @@ public class Visualizations : MonoBehaviour {
                 break;
         }
 
-        GameObject go = Instantiate(trailPrefab);
-        go.transform.SetParent(dataRoot);
-        go.transform.position = lastPoint;
+        GameObject node = Instantiate(trailPrefab);
+        node.transform.SetParent(dataRoot);
+        node.transform.position = lastPoint;
 
-        go.transform.eulerAngles = new Vector3(Mathf.Rad2Deg * packet.Pitch, Mathf.Rad2Deg * packet.Yaw, Mathf.Rad2Deg * packet.Roll);
+        node.transform.eulerAngles = new Vector3(Mathf.Rad2Deg * packet.Pitch, Mathf.Rad2Deg * packet.Yaw, Mathf.Rad2Deg * packet.Roll);
 
-        go.transform.Translate(
+        node.transform.Translate(
             packet.VelocityX * frameTick,
             packet.VelocityY * frameTick,
             packet.VelocityZ * frameTick,
@@ -124,33 +125,87 @@ public class Visualizations : MonoBehaviour {
         );
 
         if (!ShowElevation)
-            go.transform.position = new Vector3(go.transform.position.x, 0, go.transform.position.z);
+            node.transform.position = new Vector3(node.transform.position.x, 0, node.transform.position.z);
 
         if (mainCamera.IsFollowing())
-            mainCamera.FollowCurrentPoint(go);
+        {
+            mainCamera.FollowCurrentPoint(node);
 
-        lastGo = go;
-        lastPoint = go.transform.position;
+            DrawCarVisualizations(packet);
+        }
+
+        lastGo = node;
+        lastPoint = node.transform.position;
         lastTimestamp = packet.TimestampMS;
 
-        trackInfo.FindLap(go);
+        trackInfo.FindLap(node);
 
-        ElevationViz(go);
-        GForceViz(packet, go, frameTick);
-        SuspensionTravelMeshColourViz(packet, go);
-
-        NormalizedSuspensionGraph(packet);
-
-        if (ShowSuspensionTravel)
-            SuspensionTravelTireViz(packet);
+        ElevationViz(node);
+        GForceViz(packet, node, frameTick);
+        //SuspensionTravelMeshColourViz(packet, go);
     }
 
-    void NormalizedSuspensionGraph (ForzaPacket packet)
+    void DrawCarVisualizations (ForzaPacket packet)
     {
         FLGraph.AddPoint(1f - packet.NormalizedSuspensionTravelFrontLeft);
         FRGraph.AddPoint(1f - packet.NormalizedSuspensionTravelFrontRight);
         RLGraph.AddPoint(1f - packet.NormalizedSuspensionTravelRearLeft);
         RRGraph.AddPoint(1f - packet.NormalizedSuspensionTravelRearRight);
+
+        if (ShowSuspensionTravel)
+            DrawTireSuspensionTravel(packet);
+    }
+
+    public void DrawCarVisualizationsAtIndex (int packetIndex)
+    {
+        ForzaPacket packet;
+
+        List<float> FLSuspensionGraphPoints = new List<float>();
+        List<float> FRSuspensionGraphPoints = new List<float>();
+        List<float> RLSuspensionGraphPoints = new List<float>();
+        List<float> RRSuspensionGraphPoints = new List<float>();
+
+        for (int i = packetIndex; i > packetIndex - suspensionGraphVisiblePoints; i--)
+        {
+            packet = DataPoints.GetPoint(i);
+
+            if (i >= 0)
+            {
+                FLSuspensionGraphPoints.Add(1f - packet.NormalizedSuspensionTravelFrontLeft);
+                FRSuspensionGraphPoints.Add(1f - packet.NormalizedSuspensionTravelFrontRight);
+                RLSuspensionGraphPoints.Add(1f - packet.NormalizedSuspensionTravelRearLeft);
+                RRSuspensionGraphPoints.Add(1f - packet.NormalizedSuspensionTravelRearRight);
+            }
+            else
+            {
+                FLSuspensionGraphPoints.Add(0);
+                FRSuspensionGraphPoints.Add(0);
+                RLSuspensionGraphPoints.Add(0);
+                RRSuspensionGraphPoints.Add(0);
+            }
+        }
+
+        FLGraph.AddPoints(FLSuspensionGraphPoints);
+        FRGraph.AddPoints(FRSuspensionGraphPoints);
+        RLGraph.AddPoints(RLSuspensionGraphPoints);
+        RRGraph.AddPoints(RRSuspensionGraphPoints);
+
+
+        packet = DataPoints.GetPoint(packetIndex);
+
+        if (packet == null)
+            return;
+
+        if (ShowSuspensionTravel)
+            DrawTireSuspensionTravel(packet);
+    }
+
+    void DrawTireSuspensionTravel (ForzaPacket packet)
+    {
+        FLTire.transform.localPosition = new Vector3(FLTire.transform.localPosition.x, 3.2f + packet.NormalizedSuspensionTravelFrontLeft * 0.4f, FLTire.transform.localPosition.z);
+        FRTire.transform.localPosition = new Vector3(FRTire.transform.localPosition.x, 3.2f + packet.NormalizedSuspensionTravelFrontRight * 0.4f, FRTire.transform.localPosition.z);
+        RLTire.transform.localPosition = new Vector3(RLTire.transform.localPosition.x, 3.2f + packet.NormalizedSuspensionTravelRearLeft * 0.4f, RLTire.transform.localPosition.z);
+        RRTire.transform.localPosition = new Vector3(RRTire.transform.localPosition.x, 3.2f + packet.NormalizedSuspensionTravelRearRight * 0.4f, RRTire.transform.localPosition.z);
     }
 
     void ElevationViz (GameObject go)
@@ -180,31 +235,15 @@ public class Visualizations : MonoBehaviour {
 
         float gforce = accelVector.magnitude / 9.80665f;
 
-        arrow.GetComponent<MeshRenderer>().material.color = gForceGradient.Evaluate(gforce);
+        // Temporarily disabling arrow colouring due to it breaking GPU instancing
+        //arrow.GetComponent<MeshRenderer>().material.color = gForceGradient.Evaluate(gforce);
 
         Vector3 scaleArrow = arrow.transform.localScale;
         scaleArrow.z *= gforce;
         arrow.transform.localScale = scaleArrow;
     }
 
-    void SuspensionTravelTireViz (ForzaPacket packet)
-    {
-        if (mainCamera.IsFollowing())
-        {
-            FLTire.transform.localPosition = new Vector3(FLTire.transform.localPosition.x, 3.2f + packet.NormalizedSuspensionTravelFrontLeft * 0.4f, FLTire.transform.localPosition.z);
-            FRTire.transform.localPosition = new Vector3(FRTire.transform.localPosition.x, 3.2f + packet.NormalizedSuspensionTravelFrontRight * 0.4f, FRTire.transform.localPosition.z);
-            RLTire.transform.localPosition = new Vector3(RLTire.transform.localPosition.x, 3.2f + packet.NormalizedSuspensionTravelRearLeft * 0.4f, RLTire.transform.localPosition.z);
-            RRTire.transform.localPosition = new Vector3(RRTire.transform.localPosition.x, 3.2f + packet.NormalizedSuspensionTravelRearRight * 0.4f, RRTire.transform.localPosition.z);
-        }
-        else
-        {
-            FLTire.transform.localPosition = new Vector3(FLTire.transform.localPosition.x, 3.2f, FLTire.transform.localPosition.z);
-            FRTire.transform.localPosition = new Vector3(FRTire.transform.localPosition.x, 3.2f, FRTire.transform.localPosition.z);
-            RLTire.transform.localPosition = new Vector3(RLTire.transform.localPosition.x, 3.2f, RLTire.transform.localPosition.z);
-            RRTire.transform.localPosition = new Vector3(RRTire.transform.localPosition.x, 3.2f, RRTire.transform.localPosition.z);
-        }
-    }
-
+    /*
     void SuspensionTravelMeshColourViz (ForzaPacket packet, GameObject go)
     {
         if (trailVisualizationType != TrailVizType.SuspensionViz)
@@ -282,6 +321,7 @@ public class Visualizations : MonoBehaviour {
 
         return vertices;
     }
+    */
 
     public GameObject CurrentPoint ()
     {

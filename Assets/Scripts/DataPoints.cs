@@ -19,8 +19,13 @@ public class DataPoints : MonoBehaviour {
     public static ForzaPacket GetPoint (int i)
     {
         if (i >= 0 && i < allDataPoints.Count)
+        {
             return allDataPoints[i];
+        }
         else
+        {
+            Debug.Log("Couldn't return packet at index: " + i);
             return null;
+        }
     }
 }

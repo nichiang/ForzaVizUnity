@@ -36,7 +36,7 @@ public class ReadPCAP : MonoBehaviour {
 
                 if (visualizations)
                 {
-                    visualizations.DrawCar(packet);
+                    visualizations.DrawTrail(packet);
                 }
             }
             else
