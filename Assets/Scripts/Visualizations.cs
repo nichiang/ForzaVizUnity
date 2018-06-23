@@ -13,19 +13,6 @@ public class Visualizations : MonoBehaviour {
         GForce
     };
 
-    private enum MeshTopVertex
-    {
-        FrontLeft = 0,
-        FrontRight = 1,
-        RearLeft = 2,
-        RearRight = 3,
-        Center = 4,
-        FrontCenter = 5,
-        RearCenter = 6,
-        LeftCenter = 7,
-        RightCenter = 8
-    };
-
     public TrailVizType trailVisualizationType = TrailVizType.Generic;
     public Transform dataRoot;
 
@@ -40,6 +27,7 @@ public class Visualizations : MonoBehaviour {
 
     [Header("G Force")]
     public Gradient gForceGradient;
+    private List<Color> gForceGradientColours;
 
     [Header("Trail Visualization Prefabs")]
     public GameObject genericTrailPrefab;
@@ -65,25 +53,17 @@ public class Visualizations : MonoBehaviour {
     private Vector3 lastPoint;
     private UInt32 lastTimestamp = 0;
 
-    private Dictionary<MeshTopVertex, int[]> meshTopVertices;
-
     void Start ()
     {
         mainCamera = Camera.main.GetComponent<MainCamera>();
         trackInfo = GetComponent<TrackInfo>();
 
-        meshTopVertices = new Dictionary<MeshTopVertex, int[]>
+        gForceGradientColours = new List<Color>();
+
+        for (int i = 0; i <= 10; i++)
         {
-            { MeshTopVertex.FrontLeft, new int[] { 4, 15, 31 } },
-            { MeshTopVertex.FrontRight, new int[] { 0, 9, 32 } },
-            { MeshTopVertex.RearLeft, new int[] { 10, 19, 29 } },
-            { MeshTopVertex.RearRight, new int[] { 5, 14, 30 } },
-            { MeshTopVertex.Center, new int[] { 25 } },
-            { MeshTopVertex.FrontCenter, new int[] { 1, 24 } },
-            { MeshTopVertex.RearCenter, new int[] { 11, 28 } },
-            { MeshTopVertex.LeftCenter, new int[] { 16, 26 } },
-            { MeshTopVertex.RightCenter, new int[] { 6, 27 } }
-        };
+            gForceGradientColours.Add(gForceGradient.Evaluate(10f / i));
+        }
     }
 
     public void DrawTrail (ForzaPacket packet)
@@ -142,7 +122,6 @@ public class Visualizations : MonoBehaviour {
 
         ElevationViz(node);
         GForceViz(packet, node, frameTick);
-        //SuspensionTravelMeshColourViz(packet, go);
     }
 
     void DrawCarVisualizations (ForzaPacket packet)
@@ -235,93 +214,17 @@ public class Visualizations : MonoBehaviour {
 
         float gforce = accelVector.magnitude / 9.80665f;
 
-        // Temporarily disabling arrow colouring due to it breaking GPU instancing
-        //arrow.GetComponent<MeshRenderer>().material.color = gForceGradient.Evaluate(gforce);
+        int colourIndex = Mathf.RoundToInt(Mathf.Clamp(gforce, -1f, 1f) * 5) + 5;
+        //arrow.GetComponent<MeshRenderer>().material.color = gForceGradientColours[colourIndex];
+
+        MaterialPropertyBlock props = new MaterialPropertyBlock();
+        props.SetColor("_Color", gForceGradient.Evaluate(gforce));
+        arrow.GetComponent<MeshRenderer>().SetPropertyBlock(props);
 
         Vector3 scaleArrow = arrow.transform.localScale;
         scaleArrow.z *= gforce;
         arrow.transform.localScale = scaleArrow;
     }
-
-    /*
-    void SuspensionTravelMeshColourViz (ForzaPacket packet, GameObject go)
-    {
-        if (trailVisualizationType != TrailVizType.SuspensionViz)
-            return;
-        
-        // Setting mesh colours
-
-        Mesh carMesh = go.GetComponent<MeshFilter>().mesh;
-        Color32[] colours = new Color32[carMesh.vertices.Length];
-
-        for (int i = 0; i < colours.Length; i++)
-        {
-            colours[i] = Color.white;
-        }
-
-        colours = SetVertexColour(colours, MeshTopVertex.FrontLeft, suspensionGradient.Evaluate(packet.NormalizedSuspensionTravelFrontLeft));
-        colours = SetVertexColour(colours, MeshTopVertex.FrontRight, suspensionGradient.Evaluate(packet.NormalizedSuspensionTravelFrontRight));
-        colours = SetVertexColour(colours, MeshTopVertex.RearLeft, suspensionGradient.Evaluate(packet.NormalizedSuspensionTravelRearLeft));
-        colours = SetVertexColour(colours, MeshTopVertex.RearRight, suspensionGradient.Evaluate(packet.NormalizedSuspensionTravelRearRight));
-
-        carMesh.colors32 = colours;
-
-
-        // Setting suspension tilt
-
-        Vector3[] vertices = (Vector3[])carMesh.vertices.Clone();
-
-        vertices = SetVertexHeight(vertices, MeshTopVertex.FrontLeft, 1f - packet.NormalizedSuspensionTravelFrontLeft * 0.75f);
-        vertices = SetVertexHeight(vertices, MeshTopVertex.FrontRight, 1f - packet.NormalizedSuspensionTravelFrontRight * 0.75f);
-        vertices = SetVertexHeight(vertices, MeshTopVertex.RearLeft, 1f - packet.NormalizedSuspensionTravelRearLeft * 0.75f);
-        vertices = SetVertexHeight(vertices, MeshTopVertex.RearRight, 1f - packet.NormalizedSuspensionTravelRearRight * 0.75f);
-
-        vertices = BalanceVertexHeights(vertices);
-
-        carMesh.vertices = vertices;
-    }
-
-    Color32[] SetVertexColour (Color32[] colours, MeshTopVertex vertex, Color32 colour)
-    {
-        int[] topVertices = meshTopVertices[vertex];
-
-        foreach (int v in topVertices)
-        {
-            colours[v] = colour;
-        }
-
-        return colours;
-    }
-
-    Vector3[] SetVertexHeight (Vector3[] vertices, MeshTopVertex vertex, float height)
-    {
-        int[] topVertices = meshTopVertices[vertex];
-
-        foreach (int v in topVertices)
-        {
-            vertices[v].y = height;
-        }
-
-        return vertices;
-    }
-
-    Vector3[] BalanceVertexHeights (Vector3[] vertices)
-    {
-        float frontCenterHeight = (vertices[meshTopVertices[MeshTopVertex.FrontLeft][0]].y + vertices[meshTopVertices[MeshTopVertex.FrontRight][0]].y) / 2f;
-        float rearCenterHeight = (vertices[meshTopVertices[MeshTopVertex.RearLeft][0]].y + vertices[meshTopVertices[MeshTopVertex.RearRight][0]].y) / 2f;
-        float leftCenterHeight = (vertices[meshTopVertices[MeshTopVertex.FrontLeft][0]].y + vertices[meshTopVertices[MeshTopVertex.RearLeft][0]].y) / 2f;
-        float rightCenterHeight = (vertices[meshTopVertices[MeshTopVertex.FrontRight][0]].y + vertices[meshTopVertices[MeshTopVertex.RearRight][0]].y) / 2f;
-        float centerHeight = (vertices[meshTopVertices[MeshTopVertex.FrontLeft][0]].y + vertices[meshTopVertices[MeshTopVertex.FrontRight][0]].y + vertices[meshTopVertices[MeshTopVertex.RearLeft][0]].y + vertices[meshTopVertices[MeshTopVertex.RearRight][0]].y) / 4f;
-
-        vertices = SetVertexHeight(vertices, MeshTopVertex.FrontCenter, frontCenterHeight);
-        vertices = SetVertexHeight(vertices, MeshTopVertex.RearCenter, rearCenterHeight);
-        vertices = SetVertexHeight(vertices, MeshTopVertex.LeftCenter, leftCenterHeight);
-        vertices = SetVertexHeight(vertices, MeshTopVertex.RightCenter, rightCenterHeight);
-        vertices = SetVertexHeight(vertices, MeshTopVertex.Center, centerHeight);
-
-        return vertices;
-    }
-    */
 
     public GameObject CurrentPoint ()
     {
