@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GraphAnchor : MonoBehaviour
+public class CarVizAnchor : MonoBehaviour
 {
 
     // Use this for initialization

@@ -9,7 +9,7 @@ public class MainCamera : MonoBehaviour {
     public Vector3 cameraFollowPosition = new Vector3(0, 5f, -10f);
     public GameObject car;
     public Visualizations visualizations;
-    public GraphAnchor graphAnchor;
+    public CarVizAnchor graphAnchor, tractionCircleAnchor;
 
     private Camera mainCamera;
     private GameObject currentNode;
@@ -179,6 +179,7 @@ public class MainCamera : MonoBehaviour {
             car.transform.rotation = node.transform.rotation;
 
             graphAnchor.UpdatePosition();
+            tractionCircleAnchor.UpdatePosition();
 
             currentNode = node;
         }

@@ -17,12 +17,12 @@ public class Graph : MonoBehaviour
     {
         dataPoints = new Queue<float>();
         lineRenderer.positionCount = visiblePointsCount;
-        pointOffset = 1f / visiblePointsCount;
+        pointOffset = 2f / visiblePointsCount;
 
         for (int i = 0; i < visiblePointsCount; i++)
         {
             dataPoints.Enqueue(0);
-            lineRenderer.SetPosition(i, new Vector3(i * pointOffset - 0.5f, 0, 0));
+            lineRenderer.SetPosition(i, new Vector3(i * pointOffset - 1f, 0, 0));
         }
     }
 
@@ -46,7 +46,7 @@ public class Graph : MonoBehaviour
         for (int i = visiblePointsCount - 1; i >= 0; i--)
         {
             pointsEnum.MoveNext();
-            Vector3 newPoint = new Vector3(0.5f - i * pointOffset, pointsEnum.Current - 0.5f, 0);
+            Vector3 newPoint = new Vector3(1f - i * pointOffset, pointsEnum.Current - 0.5f, 0);
             lineRenderer.SetPosition(i, newPoint);
         }
     }
@@ -68,7 +68,7 @@ public class Graph : MonoBehaviour
         for (int i = 0; i < visiblePointsCount; i++)
         {
             pointsEnum.MoveNext();
-            Vector3 newPoint = new Vector3(0.5f - i * pointOffset, pointsEnum.Current - 0.5f, 0);
+            Vector3 newPoint = new Vector3(1f - i * pointOffset, pointsEnum.Current - 0.5f, 0);
             lineRenderer.SetPosition(i, newPoint);
         }
     }

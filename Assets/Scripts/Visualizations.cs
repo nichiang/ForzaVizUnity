@@ -13,21 +13,26 @@ public class Visualizations : MonoBehaviour {
         GForce
     };
 
+    public enum OnCarVizType
+    {
+        None,
+        SuspensionTravel,
+        TractionCircle
+    };
+
     public TrailVizType trailVisualizationType = TrailVizType.Generic;
-    public Transform dataRoot;
+    public OnCarVizType onCarVizType = OnCarVizType.TractionCircle;
 
     [Header("Elevation")]
     public bool ShowElevation = true;
     public FastLineRenderer elevationRenderer;
 
     [Header("Suspension Travel")]
-    public bool ShowSuspensionTravel = true;
     public Gradient suspensionGradient;
     public int suspensionGraphVisiblePoints = 20;
 
     [Header("G Force")]
     public Gradient gForceGradient;
-    private List<Color> gForceGradientColours;
 
     [Header("Trail Visualization Prefabs")]
     public GameObject genericTrailPrefab;
@@ -45,7 +50,18 @@ public class Visualizations : MonoBehaviour {
     public Graph FRGraph;
     public Graph RLGraph;
     public Graph RRGraph;
-    
+
+    [Header("Circle References")]
+    public Ellipse FLCircle;
+    public Ellipse FRCircle;
+    public Ellipse RLCircle;
+    public Ellipse RRCircle;
+
+    [Header("Misc References")]
+    public Transform dataRoot;
+    public GameObject graphAnchor;
+    public GameObject tractionCircleAnchor;
+
     private MainCamera mainCamera;
     private TrackInfo trackInfo;
 
@@ -58,11 +74,20 @@ public class Visualizations : MonoBehaviour {
         mainCamera = Camera.main.GetComponent<MainCamera>();
         trackInfo = GetComponent<TrackInfo>();
 
-        gForceGradientColours = new List<Color>();
-
-        for (int i = 0; i <= 10; i++)
+        if (onCarVizType == OnCarVizType.SuspensionTravel)
         {
-            gForceGradientColours.Add(gForceGradient.Evaluate(10f / i));
+            graphAnchor.SetActive(true);
+            tractionCircleAnchor.SetActive(false);
+        }
+        else if (onCarVizType == OnCarVizType.TractionCircle)
+        {
+            graphAnchor.SetActive(false);
+            tractionCircleAnchor.SetActive(true);
+        }
+        else
+        {
+            graphAnchor.SetActive(false);
+            tractionCircleAnchor.SetActive(false);
         }
     }
 
@@ -126,57 +151,83 @@ public class Visualizations : MonoBehaviour {
 
     void DrawCarVisualizations (ForzaPacket packet)
     {
-        FLGraph.AddPoint(1f - packet.NormalizedSuspensionTravelFrontLeft);
-        FRGraph.AddPoint(1f - packet.NormalizedSuspensionTravelFrontRight);
-        RLGraph.AddPoint(1f - packet.NormalizedSuspensionTravelRearLeft);
-        RRGraph.AddPoint(1f - packet.NormalizedSuspensionTravelRearRight);
+        if (onCarVizType == OnCarVizType.SuspensionTravel)
+        {
+            FLGraph.AddPoint(1f - packet.NormalizedSuspensionTravelFrontLeft);
+            FRGraph.AddPoint(1f - packet.NormalizedSuspensionTravelFrontRight);
+            RLGraph.AddPoint(1f - packet.NormalizedSuspensionTravelRearLeft);
+            RRGraph.AddPoint(1f - packet.NormalizedSuspensionTravelRearRight);
+        }
+        else if (onCarVizType == OnCarVizType.TractionCircle)
+        {
+            FLCircle.radius = new Vector2(packet.TireSlipAngleFrontLeft, packet.TireSlipRatioFrontLeft) / 2f;
+            FRCircle.radius = new Vector2(packet.TireSlipAngleFrontRight, packet.TireSlipRatioFrontRight) / 2f;
+            RLCircle.radius = new Vector2(packet.TireSlipAngleRearLeft, packet.TireSlipRatioRearLeft) / 2f;
+            RRCircle.radius = new Vector2(packet.TireSlipAngleRearRight, packet.TireSlipRatioRearRight) / 2f;
 
-        if (ShowSuspensionTravel)
-            DrawTireSuspensionTravel(packet);
+            FLCircle.UpdateEllipse();
+            FRCircle.UpdateEllipse();
+            RLCircle.UpdateEllipse();
+            RRCircle.UpdateEllipse();
+        }
+
+        DrawTireSuspensionTravel(packet);
     }
 
     public void DrawCarVisualizationsAtIndex (int packetIndex)
     {
         ForzaPacket packet;
 
-        List<float> FLSuspensionGraphPoints = new List<float>();
-        List<float> FRSuspensionGraphPoints = new List<float>();
-        List<float> RLSuspensionGraphPoints = new List<float>();
-        List<float> RRSuspensionGraphPoints = new List<float>();
-
-        for (int i = packetIndex; i > packetIndex - suspensionGraphVisiblePoints; i--)
+        if (onCarVizType == OnCarVizType.SuspensionTravel)
         {
-            packet = DataPoints.GetPoint(i);
+            List<float> FLSuspensionGraphPoints = new List<float>();
+            List<float> FRSuspensionGraphPoints = new List<float>();
+            List<float> RLSuspensionGraphPoints = new List<float>();
+            List<float> RRSuspensionGraphPoints = new List<float>();
 
-            if (i >= 0)
+            for (int i = packetIndex; i > packetIndex - suspensionGraphVisiblePoints; i--)
             {
-                FLSuspensionGraphPoints.Add(1f - packet.NormalizedSuspensionTravelFrontLeft);
-                FRSuspensionGraphPoints.Add(1f - packet.NormalizedSuspensionTravelFrontRight);
-                RLSuspensionGraphPoints.Add(1f - packet.NormalizedSuspensionTravelRearLeft);
-                RRSuspensionGraphPoints.Add(1f - packet.NormalizedSuspensionTravelRearRight);
+                packet = DataPoints.GetPoint(i);
+
+                if (i >= 0)
+                {
+                    FLSuspensionGraphPoints.Add(1f - packet.NormalizedSuspensionTravelFrontLeft);
+                    FRSuspensionGraphPoints.Add(1f - packet.NormalizedSuspensionTravelFrontRight);
+                    RLSuspensionGraphPoints.Add(1f - packet.NormalizedSuspensionTravelRearLeft);
+                    RRSuspensionGraphPoints.Add(1f - packet.NormalizedSuspensionTravelRearRight);
+                }
+                else
+                {
+                    FLSuspensionGraphPoints.Add(0);
+                    FRSuspensionGraphPoints.Add(0);
+                    RLSuspensionGraphPoints.Add(0);
+                    RRSuspensionGraphPoints.Add(0);
+                }
             }
-            else
-            {
-                FLSuspensionGraphPoints.Add(0);
-                FRSuspensionGraphPoints.Add(0);
-                RLSuspensionGraphPoints.Add(0);
-                RRSuspensionGraphPoints.Add(0);
-            }
+
+            FLGraph.AddPoints(FLSuspensionGraphPoints);
+            FRGraph.AddPoints(FRSuspensionGraphPoints);
+            RLGraph.AddPoints(RLSuspensionGraphPoints);
+            RRGraph.AddPoints(RRSuspensionGraphPoints);
         }
+        else if (onCarVizType == OnCarVizType.TractionCircle)
+        {
+            packet = DataPoints.GetPoint(packetIndex);
 
-        FLGraph.AddPoints(FLSuspensionGraphPoints);
-        FRGraph.AddPoints(FRSuspensionGraphPoints);
-        RLGraph.AddPoints(RLSuspensionGraphPoints);
-        RRGraph.AddPoints(RRSuspensionGraphPoints);
+            FLCircle.radius = new Vector2(packet.TireSlipAngleFrontLeft, packet.TireSlipRatioFrontLeft) / 2f;
+            FRCircle.radius = new Vector2(packet.TireSlipAngleFrontRight, packet.TireSlipRatioFrontRight) / 2f;
+            RLCircle.radius = new Vector2(packet.TireSlipAngleRearLeft, packet.TireSlipRatioRearLeft) / 2f;
+            RRCircle.radius = new Vector2(packet.TireSlipAngleRearRight, packet.TireSlipRatioRearRight) / 2f;
 
+            FLCircle.UpdateEllipse();
+            FRCircle.UpdateEllipse();
+            RLCircle.UpdateEllipse();
+            RRCircle.UpdateEllipse();
+        }
 
         packet = DataPoints.GetPoint(packetIndex);
 
-        if (packet == null)
-            return;
-
-        if (ShowSuspensionTravel)
-            DrawTireSuspensionTravel(packet);
+        DrawTireSuspensionTravel(packet);
     }
 
     void DrawTireSuspensionTravel (ForzaPacket packet)
@@ -213,9 +264,6 @@ public class Visualizations : MonoBehaviour {
         arrow.transform.forward = accelVector;
 
         float gforce = accelVector.magnitude / 9.80665f;
-
-        int colourIndex = Mathf.RoundToInt(Mathf.Clamp(gforce, -1f, 1f) * 5) + 5;
-        //arrow.GetComponent<MeshRenderer>().material.color = gForceGradientColours[colourIndex];
 
         MaterialPropertyBlock props = new MaterialPropertyBlock();
         props.SetColor("_Color", gForceGradient.Evaluate(gforce));
