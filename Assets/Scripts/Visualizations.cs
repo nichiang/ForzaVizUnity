@@ -8,7 +8,7 @@ public class Visualizations : MonoBehaviour {
 
     public enum TrailVizType
     {
-        Generic,
+        Line,
         SuspensionViz,
         GForce
     };
@@ -20,7 +20,7 @@ public class Visualizations : MonoBehaviour {
         TractionCircle
     };
 
-    public TrailVizType trailVisualizationType = TrailVizType.Generic;
+    public TrailVizType trailVisualizationType = TrailVizType.Line;
     public OnCarVizType onCarVizType = OnCarVizType.TractionCircle;
 
     [Header("Elevation")]
@@ -30,6 +30,9 @@ public class Visualizations : MonoBehaviour {
     [Header("Suspension Travel")]
     public Gradient suspensionGradient;
     public int suspensionGraphVisiblePoints = 20;
+
+    [Header("Line Trail")]
+    public FastLineRenderer lineTrailRenderer;
 
     [Header("G Force")]
     public Gradient gForceGradient;
@@ -108,6 +111,9 @@ public class Visualizations : MonoBehaviour {
 
         switch (trailVisualizationType)
         {
+            case TrailVizType.Line:
+                trailPrefab = genericTrailPrefab;
+                break;
             case TrailVizType.SuspensionViz:
                 trailPrefab = suspensionVizTrailPrefab;
                 break;
@@ -146,7 +152,16 @@ public class Visualizations : MonoBehaviour {
         trackInfo.FindLap(node);
 
         ElevationViz(node);
-        GForceViz(packet, node, frameTick);
+
+        if (trailVisualizationType == TrailVizType.Line)
+        {
+            LineTrailViz(packet, node);
+        }
+        else if (trailVisualizationType == TrailVizType.GForce)
+        {
+            GForceViz(packet, node, frameTick);
+        }
+        
     }
 
     void DrawCarVisualizations (ForzaPacket packet)
@@ -252,11 +267,21 @@ public class Visualizations : MonoBehaviour {
         elevationRenderer.Apply();
     }
 
+    void LineTrailViz (ForzaPacket packet, GameObject go)
+    {
+        FastLineRendererProperties lineRendererProps = new FastLineRendererProperties
+        {
+            Start = go.transform.position,
+            Radius = 0.1f,
+            Color = Color.white
+        };
+
+        lineTrailRenderer.AppendLine(lineRendererProps);
+        lineTrailRenderer.Apply();
+    }
+
     void GForceViz (ForzaPacket packet, GameObject go, float frameTick)
     {
-        if (trailVisualizationType != TrailVizType.GForce)
-            return;
-
         Transform arrow = go.transform.GetChild(0);
 
         Vector3 accelVector = new Vector3(packet.AccelerationX, packet.AccelerationY, packet.AccelerationZ);

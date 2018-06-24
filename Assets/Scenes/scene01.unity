@@ -784,6 +784,83 @@ GameObject:
   m_PrefabParentObject: {fileID: 1194193476853154, guid: cd4755d197d74364f95a035e47fd92c0,
     type: 2}
   m_PrefabInternal: {fileID: 2086668332}
+--- !u!1 &559775911
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 559775912}
+  - component: {fileID: 559775913}
+  m_Layer: 0
+  m_Name: LineTrail
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &559775912
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 559775911}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 875308973}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &559775913
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 559775911}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d745c13a99f8244cb610895d9558b2b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Material: {fileID: 1668209355}
+  CloneMaterial: 1
+  Camera: {fileID: 1415663437}
+  UseWorldSpace: 1
+  AnimationSpeed: 0
+  LineUVXScale: 1
+  LineUVYScale: 1
+  GlowAnimationSpeed: 0
+  GlowUVXScale: 1
+  GlowUVYScale: 1
+  StartCapScale: 1
+  EndCapScale: 1
+  TintColor:
+    serializedVersion: 2
+    rgba: 4294967295
+  GlowColor:
+    serializedVersion: 2
+    rgba: 4278255611
+  GlowIntensityMultiplier: 0
+  GlowWidthMultiplier: 0
+  GlowLengthMultiplier: 0
+  JitterMultiplier: 0
+  Turbulence: 0
+  BoundsScale: {x: 1.2, y: 1.2, z: 1.2}
+  LineTexture: {fileID: 2800000, guid: 984a88b5a0185474eb0468cd87af1f61, type: 3}
+  LineTextureStartCap: {fileID: 2800000, guid: 28bc7251a89887c48bf15fd84c04668e, type: 3}
+  LineTextureEndCap: {fileID: 2800000, guid: 45c81bb47bd46a649a5dd5dc55773d7b, type: 3}
+  LineTextureRoundJoin: {fileID: 2800000, guid: 3ca762c8af32c584b93a17bd8acda6ac,
+    type: 3}
+  GlowTexture: {fileID: 2800000, guid: 5e53321c29155e244a94a606390b62b4, type: 3}
+  GlowTextureStartCap: {fileID: 2800000, guid: 5d8643942d985534b870d1a888ddadb4, type: 3}
+  GlowTextureEndCap: {fileID: 2800000, guid: 77d11bbc2693a894daff6987aeb73dc8, type: 3}
+  GlowTextureRoundJoin: {fileID: 0}
+  ScreenRadiusMultiplier: 0
+  SortLayerName: 
+  SortOrderInLayer: 0
+  InitialLineGroups: []
 --- !u!1 &562241069
 GameObject:
   m_ObjectHideFlags: 0
@@ -1340,6 +1417,80 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lineRenderer: {fileID: 2018080577}
   visiblePointsCount: 100
+--- !u!21 &838110372
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: Elevation Line
+  m_Shader: {fileID: 4800000, guid: ad22ec22849bbe342a234a41d5170771, type: 3}
+  m_ShaderKeywords: 
+  m_LightmapFlags: 5
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: 2999
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _GlowTex:
+        m_Texture: {fileID: 2800000, guid: 5e53321c29155e244a94a606390b62b4, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _GlowTexEndCap:
+        m_Texture: {fileID: 2800000, guid: 77d11bbc2693a894daff6987aeb73dc8, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _GlowTexRoundJoin:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _GlowTexStartCap:
+        m_Texture: {fileID: 2800000, guid: 5d8643942d985534b870d1a888ddadb4, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 2800000, guid: 984a88b5a0185474eb0468cd87af1f61, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTexEndCap:
+        m_Texture: {fileID: 2800000, guid: 45c81bb47bd46a649a5dd5dc55773d7b, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTexRoundJoin:
+        m_Texture: {fileID: 2800000, guid: 3ca762c8af32c584b93a17bd8acda6ac, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTexStartCap:
+        m_Texture: {fileID: 2800000, guid: 28bc7251a89887c48bf15fd84c04668e, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - _AnimationSpeed: 0
+    - _AnimationSpeedGlow: 0
+    - _CameraPixelHeight: 91
+    - _CameraTangent: 1.1547005
+    - _ElapsedSecondsOverride: 999999
+    - _GlowIntensityMultiplier: 0
+    - _GlowLengthMultiplier: 0
+    - _GlowWidthMultiplier: 0
+    - _InvFade: 1
+    - _JitterMultiplier: 0
+    - _OneOverCameraPixelHeight: 0.010989011
+    - _ScreenRadiusMultiplier: 0
+    - _Turbulence: 0
+    - _UVXScale: 1
+    - _UVXScaleGlow: 1
+    - _UVYScale: 1
+    - _UVYScaleGlow: 1
+    m_Colors:
+    - _CameraDownVector: {r: -0, g: -1, b: -0, a: 0}
+    - _CameraRightVector: {r: 1, g: 0, b: 0, a: 0}
+    - _GlowTintColor: {r: 0.9843137, g: 1, b: 0, a: 1}
+    - _TintColor: {r: 1, g: 1, b: 1, a: 1}
+    - _TurbulenceVelocity: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &841062131
 GameObject:
   m_ObjectHideFlags: 0
@@ -1486,6 +1637,7 @@ Transform:
   - {fileID: 1135690199}
   - {fileID: 1824164363}
   - {fileID: 934819962}
+  - {fileID: 559775912}
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1500,8 +1652,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d12cef058e15548468ff36e675dd8bb7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  trailVisualizationType: 2
-  onCarVizType: 0
+  trailVisualizationType: 0
+  onCarVizType: 2
   ShowElevation: 0
   elevationRenderer: {fileID: 934819961}
   suspensionGradient:
@@ -1534,6 +1686,7 @@ MonoBehaviour:
     m_NumColorKeys: 3
     m_NumAlphaKeys: 2
   suspensionGraphVisiblePoints: 100
+  lineTrailRenderer: {fileID: 559775913}
   gForceGradient:
     serializedVersion: 2
     key0: {r: 0.25490198, g: 0.93725497, b: 0.882353, a: 1}
@@ -1563,7 +1716,7 @@ MonoBehaviour:
     m_Mode: 0
     m_NumColorKeys: 3
     m_NumAlphaKeys: 2
-  genericTrailPrefab: {fileID: 1991486745234664, guid: 4289d6fc7e87ecd44bdb14b6d90b1e21,
+  genericTrailPrefab: {fileID: 1848017013200174, guid: 3bd51a25b8e0506408673f367b8da3ed,
     type: 2}
   suspensionVizTrailPrefab: {fileID: 1596733638980608, guid: 82ab2b08af0e8cd45995dc7c15471fca,
     type: 2}
@@ -1759,7 +1912,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d745c13a99f8244cb610895d9558b2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Material: {fileID: 1825274243}
+  Material: {fileID: 838110372}
   CloneMaterial: 1
   Camera: {fileID: 1415663437}
   UseWorldSpace: 1
@@ -2561,6 +2714,80 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!21 &1668209355
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: Elevation Line
+  m_Shader: {fileID: 4800000, guid: ad22ec22849bbe342a234a41d5170771, type: 3}
+  m_ShaderKeywords: 
+  m_LightmapFlags: 5
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: 2999
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _GlowTex:
+        m_Texture: {fileID: 2800000, guid: 5e53321c29155e244a94a606390b62b4, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _GlowTexEndCap:
+        m_Texture: {fileID: 2800000, guid: 77d11bbc2693a894daff6987aeb73dc8, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _GlowTexRoundJoin:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _GlowTexStartCap:
+        m_Texture: {fileID: 2800000, guid: 5d8643942d985534b870d1a888ddadb4, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 2800000, guid: 984a88b5a0185474eb0468cd87af1f61, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTexEndCap:
+        m_Texture: {fileID: 2800000, guid: 45c81bb47bd46a649a5dd5dc55773d7b, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTexRoundJoin:
+        m_Texture: {fileID: 2800000, guid: 3ca762c8af32c584b93a17bd8acda6ac, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTexStartCap:
+        m_Texture: {fileID: 2800000, guid: 28bc7251a89887c48bf15fd84c04668e, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - _AnimationSpeed: 0
+    - _AnimationSpeedGlow: 0
+    - _CameraPixelHeight: 91
+    - _CameraTangent: 1.1547005
+    - _ElapsedSecondsOverride: 999999
+    - _GlowIntensityMultiplier: 0
+    - _GlowLengthMultiplier: 0
+    - _GlowWidthMultiplier: 0
+    - _InvFade: 1
+    - _JitterMultiplier: 0
+    - _OneOverCameraPixelHeight: 0.010989011
+    - _ScreenRadiusMultiplier: 0
+    - _Turbulence: 0
+    - _UVXScale: 1
+    - _UVXScaleGlow: 1
+    - _UVYScale: 1
+    - _UVYScaleGlow: 1
+    m_Colors:
+    - _CameraDownVector: {r: -0, g: -1, b: -0, a: 0}
+    - _CameraRightVector: {r: 1, g: 0, b: 0, a: 0}
+    - _GlowTintColor: {r: 0.9843137, g: 1, b: 0, a: 1}
+    - _TintColor: {r: 1, g: 1, b: 1, a: 1}
+    - _TurbulenceVelocity: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &1700114187
 GameObject:
   m_ObjectHideFlags: 0
@@ -2837,6 +3064,84 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+--- !u!1 &1804989650
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 1804989651}
+  - component: {fileID: 1804989653}
+  - component: {fileID: 1804989652}
+  m_Layer: 5
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1804989651
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1804989650}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1949984209}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 220, y: -20}
+  m_SizeDelta: {x: 200, y: 200}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1804989652
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1804989650}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bac7be8a7c5df4b499cdde61acbc9947, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 0, b: 0, a: 1}
+  m_RaycastTarget: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
+      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  m_Texture: {fileID: 0}
+  m_UVRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 1
+    height: 1
+  LineThickness: 1
+  UseMargins: 0
+  Margin: {x: 0, y: 0}
+  Points:
+  - {x: -100, y: 100}
+  - {x: -100, y: -100}
+  - {x: 100, y: -100}
+  relativeSize: 0
+  LineList: 0
+  LineCaps: 0
+  LineJoins: 0
+--- !u!222 &1804989653
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1804989650}
 --- !u!1 &1824164362
 GameObject:
   m_ObjectHideFlags: 0
@@ -2881,80 +3186,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ae3eb819ff81dcd44b24e2aee53332fa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!21 &1825274243
-Material:
-  serializedVersion: 6
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_Name: Elevation Line
-  m_Shader: {fileID: 4800000, guid: ad22ec22849bbe342a234a41d5170771, type: 3}
-  m_ShaderKeywords: 
-  m_LightmapFlags: 5
-  m_EnableInstancingVariants: 0
-  m_DoubleSidedGI: 0
-  m_CustomRenderQueue: 2999
-  stringTagMap: {}
-  disabledShaderPasses: []
-  m_SavedProperties:
-    serializedVersion: 3
-    m_TexEnvs:
-    - _GlowTex:
-        m_Texture: {fileID: 2800000, guid: 5e53321c29155e244a94a606390b62b4, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _GlowTexEndCap:
-        m_Texture: {fileID: 2800000, guid: 77d11bbc2693a894daff6987aeb73dc8, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _GlowTexRoundJoin:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _GlowTexStartCap:
-        m_Texture: {fileID: 2800000, guid: 5d8643942d985534b870d1a888ddadb4, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 984a88b5a0185474eb0468cd87af1f61, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MainTexEndCap:
-        m_Texture: {fileID: 2800000, guid: 45c81bb47bd46a649a5dd5dc55773d7b, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MainTexRoundJoin:
-        m_Texture: {fileID: 2800000, guid: 3ca762c8af32c584b93a17bd8acda6ac, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MainTexStartCap:
-        m_Texture: {fileID: 2800000, guid: 28bc7251a89887c48bf15fd84c04668e, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Floats:
-    - _AnimationSpeed: 0
-    - _AnimationSpeedGlow: 0
-    - _CameraPixelHeight: 91
-    - _CameraTangent: 1.1547005
-    - _ElapsedSecondsOverride: 999999
-    - _GlowIntensityMultiplier: 0
-    - _GlowLengthMultiplier: 0
-    - _GlowWidthMultiplier: 0
-    - _InvFade: 1
-    - _JitterMultiplier: 0
-    - _OneOverCameraPixelHeight: 0.010989011
-    - _ScreenRadiusMultiplier: 0
-    - _Turbulence: 0
-    - _UVXScale: 1
-    - _UVXScaleGlow: 1
-    - _UVYScale: 1
-    - _UVYScaleGlow: 1
-    m_Colors:
-    - _CameraDownVector: {r: -0, g: -1, b: -0, a: 0}
-    - _CameraRightVector: {r: 1, g: 0, b: 0, a: 0}
-    - _GlowTintColor: {r: 0.9843137, g: 1, b: 0, a: 1}
-    - _TintColor: {r: 1, g: 1, b: 1, a: 1}
-    - _TurbulenceVelocity: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &1826372308
 GameObject:
   m_ObjectHideFlags: 0
@@ -3137,6 +3368,100 @@ GameObject:
   m_PrefabParentObject: {fileID: 1403748062296768, guid: cd4755d197d74364f95a035e47fd92c0,
     type: 2}
   m_PrefabInternal: {fileID: 2086668332}
+--- !u!1 &1949984205
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 1949984209}
+  - component: {fileID: 1949984208}
+  - component: {fileID: 1949984207}
+  - component: {fileID: 1949984206}
+  m_Layer: 5
+  m_Name: Canvas
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!114 &1949984206
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1949984205}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1301386320, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IgnoreReversedGraphics: 1
+  m_BlockingObjects: 0
+  m_BlockingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+--- !u!114 &1949984207
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1949984205}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1980459831, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_UiScaleMode: 1
+  m_ReferencePixelsPerUnit: 100
+  m_ScaleFactor: 1
+  m_ReferenceResolution: {x: 800, y: 600}
+  m_ScreenMatchMode: 0
+  m_MatchWidthOrHeight: 0
+  m_PhysicalUnit: 3
+  m_FallbackScreenDPI: 96
+  m_DefaultSpriteDPI: 96
+  m_DynamicPixelsPerUnit: 1
+--- !u!223 &1949984208
+Canvas:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1949984205}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_RenderMode: 0
+  m_Camera: {fileID: 0}
+  m_PlaneDistance: 100
+  m_PixelPerfect: 0
+  m_ReceivesEvents: 1
+  m_OverrideSorting: 0
+  m_OverridePixelPerfect: 0
+  m_SortingBucketNormalizedSize: 0
+  m_AdditionalShaderChannelsFlag: 0
+  m_SortingLayerID: 0
+  m_SortingOrder: 0
+  m_TargetDisplay: 0
+--- !u!224 &1949984209
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1949984205}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0, y: 0, z: 0}
+  m_Children:
+  - {fileID: 1804989651}
+  m_Father: {fileID: 0}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0, y: 0}
 --- !u!1 &2006358034
 GameObject:
   m_ObjectHideFlags: 0
