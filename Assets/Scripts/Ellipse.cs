@@ -24,17 +24,19 @@ public class Ellipse : MonoBehaviour
         if (self_lineRenderer == null)
             self_lineRenderer = GetComponent<LineRenderer>();
 
-        self_lineRenderer.positionCount = resolution + 3;
+        self_lineRenderer.loop = true;
+
+        self_lineRenderer.positionCount = resolution + 1;
 
         self_lineRenderer.startWidth = width;
         self_lineRenderer.endWidth = width;
         
         AddPointToLineRenderer(0f, 0);
-        for (int i = 1; i <= resolution + 1; i++)
+        for (int i = 1; i <= resolution; i++)
         {
             AddPointToLineRenderer((float)i / (float)(resolution) * 2.0f * Mathf.PI, i);
         }
-        AddPointToLineRenderer(0f, resolution + 2);
+        //AddPointToLineRenderer(0f, resolution + 2);
     }
 
     void AddPointToLineRenderer(float angle, int index)

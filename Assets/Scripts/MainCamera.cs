@@ -86,6 +86,11 @@ public class MainCamera : MonoBehaviour {
             {
                 int currentIndex = visualizations.CurrentPoint().transform.GetSiblingIndex();
                 visualizations.DrawCarVisualizationsAtIndex(currentIndex);
+                visualizations.ShowElevationLines(true);
+            }
+            else
+            {
+                visualizations.ShowElevationLines(false);
             }
         }
 

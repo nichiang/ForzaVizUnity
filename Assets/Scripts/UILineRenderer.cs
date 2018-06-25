@@ -249,8 +249,6 @@ namespace UnityEngine.UI.Extensions
 
         private UIVertex[] CreateLineSegment(Vector2 start, Vector2 end, SegmentType type)
         {
-            List<UIVertex> points = new List<UIVertex>();
-
             var uvs = middleUvs;
             if (type == SegmentType.Start)
                 uvs = startUvs;

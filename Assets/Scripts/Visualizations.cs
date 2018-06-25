@@ -59,6 +59,10 @@ public class Visualizations : MonoBehaviour {
     public Ellipse FRCircle;
     public Ellipse RLCircle;
     public Ellipse RRCircle;
+    private LineRenderer FLpointer;
+    private LineRenderer FRpointer;
+    private LineRenderer RLpointer;
+    private LineRenderer RRpointer;
 
     [Header("Misc References")]
     public Transform dataRoot;
@@ -92,6 +96,11 @@ public class Visualizations : MonoBehaviour {
             graphAnchor.SetActive(false);
             tractionCircleAnchor.SetActive(false);
         }
+
+        FLpointer = FLCircle.transform.GetChild(0).GetComponent<LineRenderer>();
+        FRpointer = FRCircle.transform.GetChild(0).GetComponent<LineRenderer>();
+        RLpointer = RLCircle.transform.GetChild(0).GetComponent<LineRenderer>();
+        RRpointer = RRCircle.transform.GetChild(0).GetComponent<LineRenderer>();
     }
 
     public void DrawTrail (ForzaPacket packet)
@@ -151,7 +160,7 @@ public class Visualizations : MonoBehaviour {
 
         trackInfo.FindLap(node);
 
-        ElevationViz(node);
+        //ElevationViz(node);
 
         if (trailVisualizationType == TrailVizType.Line)
         {
@@ -175,15 +184,7 @@ public class Visualizations : MonoBehaviour {
         }
         else if (onCarVizType == OnCarVizType.TractionCircle)
         {
-            FLCircle.radius = new Vector2(packet.TireSlipAngleFrontLeft, packet.TireSlipRatioFrontLeft) / 2f;
-            FRCircle.radius = new Vector2(packet.TireSlipAngleFrontRight, packet.TireSlipRatioFrontRight) / 2f;
-            RLCircle.radius = new Vector2(packet.TireSlipAngleRearLeft, packet.TireSlipRatioRearLeft) / 2f;
-            RRCircle.radius = new Vector2(packet.TireSlipAngleRearRight, packet.TireSlipRatioRearRight) / 2f;
-
-            FLCircle.UpdateEllipse();
-            FRCircle.UpdateEllipse();
-            RLCircle.UpdateEllipse();
-            RRCircle.UpdateEllipse();
+            DrawTractionCircles(packet);
         }
 
         DrawTireSuspensionTravel(packet);
@@ -229,20 +230,35 @@ public class Visualizations : MonoBehaviour {
         {
             packet = DataPoints.GetPoint(packetIndex);
 
-            FLCircle.radius = new Vector2(packet.TireSlipAngleFrontLeft, packet.TireSlipRatioFrontLeft) / 2f;
-            FRCircle.radius = new Vector2(packet.TireSlipAngleFrontRight, packet.TireSlipRatioFrontRight) / 2f;
-            RLCircle.radius = new Vector2(packet.TireSlipAngleRearLeft, packet.TireSlipRatioRearLeft) / 2f;
-            RRCircle.radius = new Vector2(packet.TireSlipAngleRearRight, packet.TireSlipRatioRearRight) / 2f;
-
-            FLCircle.UpdateEllipse();
-            FRCircle.UpdateEllipse();
-            RLCircle.UpdateEllipse();
-            RRCircle.UpdateEllipse();
+            DrawTractionCircles(packet);
         }
 
         packet = DataPoints.GetPoint(packetIndex);
 
         DrawTireSuspensionTravel(packet);
+    }
+
+    void DrawTractionCircles (ForzaPacket packet)
+    {
+        float FLradius = Mathf.Max(packet.TireSlipAngleFrontLeft, packet.TireSlipRatioFrontLeft) / 2f;
+        float FRradius = Mathf.Max(packet.TireSlipAngleFrontRight, packet.TireSlipRatioFrontRight) / 2f;
+        float RLradius = Mathf.Max(packet.TireSlipAngleRearLeft, packet.TireSlipRatioRearLeft) / 2f;
+        float RRradius = Mathf.Max(packet.TireSlipAngleRearRight, packet.TireSlipRatioRearRight) / 2f;
+
+        FLCircle.radius = new Vector2(FLradius, FLradius);
+        FRCircle.radius = new Vector2(FRradius, FRradius);
+        RLCircle.radius = new Vector2(RLradius, RLradius);
+        RRCircle.radius = new Vector2(RRradius, RRradius);
+
+        FLCircle.UpdateEllipse();
+        FRCircle.UpdateEllipse();
+        RLCircle.UpdateEllipse();
+        RRCircle.UpdateEllipse();
+
+        FLpointer.SetPosition(1, new Vector3(packet.TireSlipAngleFrontLeft, packet.TireSlipRatioFrontLeft, 0) / 2f);
+        FRpointer.SetPosition(1, new Vector3(packet.TireSlipAngleFrontRight, packet.TireSlipRatioFrontRight, 0) / 2f);
+        RLpointer.SetPosition(1, new Vector3(packet.TireSlipAngleRearLeft, packet.TireSlipRatioRearLeft, 0) / 2f);
+        RRpointer.SetPosition(1, new Vector3(packet.TireSlipAngleRearRight, packet.TireSlipRatioRearRight, 0) / 2f);
     }
 
     void DrawTireSuspensionTravel (ForzaPacket packet)
@@ -267,13 +283,28 @@ public class Visualizations : MonoBehaviour {
         elevationRenderer.Apply();
     }
 
+    public void ShowElevationLines (bool show)
+    {
+        if (show)
+        {
+            elevationRenderer.ScreenRadiusMultiplier = 0;
+        }
+        else
+        {
+            elevationRenderer.ScreenRadiusMultiplier = 0.001f;
+        }
+    }
+
     void LineTrailViz (ForzaPacket packet, GameObject go)
     {
+        float gforce = packet.AccelerationZ / 9.80665f;
+
         FastLineRendererProperties lineRendererProps = new FastLineRendererProperties
         {
             Start = go.transform.position,
             Radius = 0.1f,
-            Color = Color.white
+            Color = gForceGradient.Evaluate(gforce  * 0.5f + 0.5f),
+            LineJoin = FastLineRendererLineJoin.AttachToPrevious
         };
 
         lineTrailRenderer.AppendLine(lineRendererProps);
