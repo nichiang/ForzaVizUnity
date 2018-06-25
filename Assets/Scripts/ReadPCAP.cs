@@ -10,6 +10,7 @@ public class ReadPCAP : MonoBehaviour {
 
     public int listenPort = 51384;
     public Visualizations visualizations;
+    public UIVisualizations uiVisualizations;
 
     private UdpClient receivingUdpClient;
     private ConcurrentQueue<ForzaPacket> packetQueue;
@@ -42,10 +43,8 @@ public class ReadPCAP : MonoBehaviour {
             {
                 DataPoints.AddPoint(packet);
 
-                if (visualizations)
-                {
-                    visualizations.DrawTrail(packet);
-                }
+                visualizations.DrawTrail(packet);
+                uiVisualizations.DrawUI(packet);
             }
         }
     }

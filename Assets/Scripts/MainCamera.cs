@@ -9,6 +9,7 @@ public class MainCamera : MonoBehaviour {
     public Vector3 cameraFollowPosition = new Vector3(0, 5f, -10f);
     public GameObject car;
     public Visualizations visualizations;
+    public UIVisualizations uiVisualizations;
     public CarVizAnchor graphAnchor, tractionCircleAnchor;
 
     private Camera mainCamera;
@@ -43,6 +44,7 @@ public class MainCamera : MonoBehaviour {
                     GameObject prevSibling = currentNode.transform.parent.GetChild(prevIndex).gameObject;
                     FollowCurrentPoint(prevSibling, true, Direction.backward);
                     visualizations.DrawCarVisualizationsAtIndex(prevIndex);
+                    uiVisualizations.DrawUIAtIndex(prevIndex);
                 }
 
                 prevStepCount++;
@@ -67,6 +69,7 @@ public class MainCamera : MonoBehaviour {
                     GameObject prevSibling = currentNode.transform.parent.GetChild(nextIndex).gameObject;
                     FollowCurrentPoint(prevSibling, true, Direction.forward);
                     visualizations.DrawCarVisualizationsAtIndex(nextIndex);
+                    uiVisualizations.DrawUIAtIndex(nextIndex);
                 }
 
                 nextStepCount++;
@@ -86,6 +89,7 @@ public class MainCamera : MonoBehaviour {
             {
                 int currentIndex = visualizations.CurrentPoint().transform.GetSiblingIndex();
                 visualizations.DrawCarVisualizationsAtIndex(currentIndex);
+                uiVisualizations.DrawUIAtIndex(currentIndex);
                 visualizations.ShowElevationLines(true);
             }
             else

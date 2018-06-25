@@ -240,15 +240,10 @@ public class Visualizations : MonoBehaviour {
 
     void DrawTractionCircles (ForzaPacket packet)
     {
-        float FLradius = Mathf.Max(packet.TireSlipAngleFrontLeft, packet.TireSlipRatioFrontLeft) / 2f;
-        float FRradius = Mathf.Max(packet.TireSlipAngleFrontRight, packet.TireSlipRatioFrontRight) / 2f;
-        float RLradius = Mathf.Max(packet.TireSlipAngleRearLeft, packet.TireSlipRatioRearLeft) / 2f;
-        float RRradius = Mathf.Max(packet.TireSlipAngleRearRight, packet.TireSlipRatioRearRight) / 2f;
-
-        FLCircle.radius = new Vector2(FLradius, FLradius);
-        FRCircle.radius = new Vector2(FRradius, FRradius);
-        RLCircle.radius = new Vector2(RLradius, RLradius);
-        RRCircle.radius = new Vector2(RRradius, RRradius);
+        FLCircle.radius = new Vector2(packet.TireCombinedSlipFrontLeft, packet.TireCombinedSlipFrontLeft) / 2f;
+        FRCircle.radius = new Vector2(packet.TireCombinedSlipFrontRight, packet.TireCombinedSlipFrontRight) / 2f;
+        RLCircle.radius = new Vector2(packet.TireCombinedSlipRearLeft, packet.TireCombinedSlipRearLeft) / 2f;
+        RRCircle.radius = new Vector2(packet.TireCombinedSlipRearRight, packet.TireCombinedSlipRearRight) / 2f;
 
         FLCircle.UpdateEllipse();
         FRCircle.UpdateEllipse();
