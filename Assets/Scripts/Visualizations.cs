@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 using DigitalRuby.FastLineRenderer;
 
 public class Visualizations : MonoBehaviour {
@@ -54,15 +55,24 @@ public class Visualizations : MonoBehaviour {
     public Graph RLGraph;
     public Graph RRGraph;
 
-    [Header("Circle References")]
+    [Header("Traction Circle References")]
+    public bool ShowTractionCircleHistory = true;
+    public int TractionCircleHistoryCount = 50;
+    public int TractionCircleHistoryDensity = 4;
+    public Gradient TractionCircleHistoryGradient;
     public Ellipse FLCircle;
     public Ellipse FRCircle;
     public Ellipse RLCircle;
     public Ellipse RRCircle;
-    private LineRenderer FLpointer;
-    private LineRenderer FRpointer;
-    private LineRenderer RLpointer;
-    private LineRenderer RRpointer;
+    public GameObject CircleHistoryPrefab;
+    private LineRenderer FLPointer;
+    private LineRenderer FRPointer;
+    private LineRenderer RLPointer;
+    private LineRenderer RRPointer;
+    private Transform FLDataPointsRoot;
+    private Transform FRDataPointsRoot;
+    private Transform RLDataPointsRoot;
+    private Transform RRDataPointsRoot;
 
     [Header("Misc References")]
     public Transform dataRoot;
@@ -97,10 +107,15 @@ public class Visualizations : MonoBehaviour {
             tractionCircleAnchor.SetActive(false);
         }
 
-        FLpointer = FLCircle.transform.GetChild(0).GetComponent<LineRenderer>();
-        FRpointer = FRCircle.transform.GetChild(0).GetComponent<LineRenderer>();
-        RLpointer = RLCircle.transform.GetChild(0).GetComponent<LineRenderer>();
-        RRpointer = RRCircle.transform.GetChild(0).GetComponent<LineRenderer>();
+        FLPointer = FLCircle.transform.GetChild(0).GetComponent<LineRenderer>();
+        FRPointer = FRCircle.transform.GetChild(0).GetComponent<LineRenderer>();
+        RLPointer = RLCircle.transform.GetChild(0).GetComponent<LineRenderer>();
+        RRPointer = RRCircle.transform.GetChild(0).GetComponent<LineRenderer>();
+
+        FLDataPointsRoot = FLCircle.transform.parent.GetChild(1);
+        FRDataPointsRoot = FRCircle.transform.parent.GetChild(1);
+        RLDataPointsRoot = RLCircle.transform.parent.GetChild(1);
+        RRDataPointsRoot = RRCircle.transform.parent.GetChild(1);
     }
 
     public void DrawTrail (ForzaPacket packet)
@@ -230,7 +245,7 @@ public class Visualizations : MonoBehaviour {
         {
             packet = DataPoints.GetPoint(packetIndex);
 
-            DrawTractionCircles(packet);
+            DrawTractionCircles(packet, packetIndex);
         }
 
         packet = DataPoints.GetPoint(packetIndex);
@@ -238,7 +253,7 @@ public class Visualizations : MonoBehaviour {
         DrawTireSuspensionTravel(packet);
     }
 
-    void DrawTractionCircles (ForzaPacket packet)
+    void DrawTractionCircles (ForzaPacket packet, int packetIndex = -1)
     {
         FLCircle.radius = new Vector2(packet.TireCombinedSlipFrontLeft, packet.TireCombinedSlipFrontLeft) / 2f;
         FRCircle.radius = new Vector2(packet.TireCombinedSlipFrontRight, packet.TireCombinedSlipFrontRight) / 2f;
@@ -250,10 +265,83 @@ public class Visualizations : MonoBehaviour {
         RLCircle.UpdateEllipse();
         RRCircle.UpdateEllipse();
 
-        FLpointer.SetPosition(1, new Vector3(packet.TireSlipAngleFrontLeft, packet.TireSlipRatioFrontLeft, 0) / 2f);
-        FRpointer.SetPosition(1, new Vector3(packet.TireSlipAngleFrontRight, packet.TireSlipRatioFrontRight, 0) / 2f);
-        RLpointer.SetPosition(1, new Vector3(packet.TireSlipAngleRearLeft, packet.TireSlipRatioRearLeft, 0) / 2f);
-        RRpointer.SetPosition(1, new Vector3(packet.TireSlipAngleRearRight, packet.TireSlipRatioRearRight, 0) / 2f);
+        FLPointer.SetPosition(1, new Vector3(packet.TireSlipAngleFrontLeft, packet.TireSlipRatioFrontLeft, 0) / 2f);
+        FRPointer.SetPosition(1, new Vector3(packet.TireSlipAngleFrontRight, packet.TireSlipRatioFrontRight, 0) / 2f);
+        RLPointer.SetPosition(1, new Vector3(packet.TireSlipAngleRearLeft, packet.TireSlipRatioRearLeft, 0) / 2f);
+        RRPointer.SetPosition(1, new Vector3(packet.TireSlipAngleRearRight, packet.TireSlipRatioRearRight, 0) / 2f);
+
+        if (ShowTractionCircleHistory)
+        {
+            if (DataPoints.GetCurrentPacketIndex() % TractionCircleHistoryDensity == 0) // Run every n-th time
+                DrawTractionCircleHistory(packetIndex);
+        }
+    }
+
+    void DrawTractionCircleHistory (int packetIndex = -1)
+    {
+        int currentPacketIndex = packetIndex == -1 ? DataPoints.GetCurrentPacketIndex() : packetIndex;
+        ForzaPacket packet;
+
+        if (FLDataPointsRoot.childCount == 0) {
+            for (int i = 0; i < TractionCircleHistoryCount; i++)
+            {
+                packet = DataPoints.GetPoint(i);
+
+                Instantiate(CircleHistoryPrefab, Vector3.zero, Quaternion.identity, FLDataPointsRoot);
+                Instantiate(CircleHistoryPrefab, Vector3.zero, Quaternion.identity, FRDataPointsRoot);
+                Instantiate(CircleHistoryPrefab, Vector3.zero, Quaternion.identity, RLDataPointsRoot);
+                Instantiate(CircleHistoryPrefab, Vector3.zero, Quaternion.identity, RRDataPointsRoot);
+            }
+        }
+
+        int childIndex = 0;
+
+        for (int i = currentPacketIndex - TractionCircleHistoryCount * TractionCircleHistoryDensity + 1; i <= currentPacketIndex; i += TractionCircleHistoryDensity)
+        {
+            packet = DataPoints.GetPoint(i);
+
+            Transform FL = FLDataPointsRoot.GetChild(childIndex);
+            Transform FR = FRDataPointsRoot.GetChild(childIndex);
+            Transform RL = RLDataPointsRoot.GetChild(childIndex);
+            Transform RR = RRDataPointsRoot.GetChild(childIndex);
+
+            Material FLMat = FL.GetComponent<MeshRenderer>().material;
+            Material FRMat = FR.GetComponent<MeshRenderer>().material;
+            Material RLMat = RL.GetComponent<MeshRenderer>().material;
+            Material RRMat = RR.GetComponent<MeshRenderer>().material;
+
+            if (packet != null)
+            {
+                FL.localPosition = new Vector3(packet.TireSlipAngleFrontLeft, packet.TireSlipRatioFrontLeft, 0) / 2f;
+                FR.localPosition = new Vector3(packet.TireSlipAngleFrontRight, packet.TireSlipRatioFrontRight, 0) / 2f;
+                RL.localPosition = new Vector3(packet.TireSlipAngleRearLeft, packet.TireSlipRatioRearLeft, 0) / 2f;
+                RR.localPosition = new Vector3(packet.TireSlipAngleRearRight, packet.TireSlipRatioRearRight, 0) / 2f;
+
+                FLMat.color = TractionCircleHistoryGradient.Evaluate(childIndex / 50f);
+                FRMat.color = TractionCircleHistoryGradient.Evaluate(childIndex / 50f);
+                RLMat.color = TractionCircleHistoryGradient.Evaluate(childIndex / 50f);
+                RRMat.color = TractionCircleHistoryGradient.Evaluate(childIndex / 50f);
+
+                FL.GetComponent<MeshRenderer>().sortingOrder = childIndex;
+                FR.GetComponent<MeshRenderer>().sortingOrder = childIndex;
+                RL.GetComponent<MeshRenderer>().sortingOrder = childIndex;
+                RR.GetComponent<MeshRenderer>().sortingOrder = childIndex;
+
+                FL.gameObject.SetActive(true);
+                FR.gameObject.SetActive(true);
+                RL.gameObject.SetActive(true);
+                RR.gameObject.SetActive(true);
+            }
+            else
+            {
+                FL.gameObject.SetActive(false);
+                FR.gameObject.SetActive(false);
+                RL.gameObject.SetActive(false);
+                RR.gameObject.SetActive(false);
+            }
+
+            childIndex++;
+        }
     }
 
     void DrawTireSuspensionTravel (ForzaPacket packet)

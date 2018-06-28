@@ -24,8 +24,12 @@ public class DataPoints : MonoBehaviour {
         }
         else
         {
-            Debug.Log("Couldn't return packet at index: " + i);
             return null;
         }
+    }
+
+    public static int GetCurrentPacketIndex ()
+    {
+        return allDataPoints.Count - 1;
     }
 }
