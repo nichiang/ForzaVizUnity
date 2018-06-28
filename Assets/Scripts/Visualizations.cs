@@ -21,6 +21,12 @@ public class Visualizations : MonoBehaviour {
         TractionCircle
     };
 
+    public enum TractionCircleVizType
+    {
+        Dots,
+        Line
+    }
+
     public TrailVizType trailVisualizationType = TrailVizType.Line;
     public OnCarVizType onCarVizType = OnCarVizType.TractionCircle;
 
@@ -59,6 +65,7 @@ public class Visualizations : MonoBehaviour {
     public bool ShowTractionCircleHistory = true;
     public int TractionCircleHistoryCount = 50;
     public int TractionCircleHistoryDensity = 4;
+    public TractionCircleVizType tractionCircleVizType = TractionCircleVizType.Line;
     public Gradient TractionCircleHistoryGradient;
     public Ellipse FLCircle;
     public Ellipse FRCircle;
@@ -281,66 +288,94 @@ public class Visualizations : MonoBehaviour {
     {
         int currentPacketIndex = packetIndex == -1 ? DataPoints.GetCurrentPacketIndex() : packetIndex;
         ForzaPacket packet;
+        int childIndex = 0;
 
-        if (FLDataPointsRoot.childCount == 0) {
-            for (int i = 0; i < TractionCircleHistoryCount; i++)
+        if (tractionCircleVizType == TractionCircleVizType.Dots)
+        {
+            if (FLDataPointsRoot.childCount == 0)
+            {
+                for (int i = 0; i < TractionCircleHistoryCount; i++)
+                {
+                    Instantiate(CircleHistoryPrefab, Vector3.zero, Quaternion.identity, FLDataPointsRoot);
+                    Instantiate(CircleHistoryPrefab, Vector3.zero, Quaternion.identity, FRDataPointsRoot);
+                    Instantiate(CircleHistoryPrefab, Vector3.zero, Quaternion.identity, RLDataPointsRoot);
+                    Instantiate(CircleHistoryPrefab, Vector3.zero, Quaternion.identity, RRDataPointsRoot);
+                }
+            }
+
+            for (int i = currentPacketIndex - TractionCircleHistoryCount * TractionCircleHistoryDensity + 1; i <= currentPacketIndex; i += TractionCircleHistoryDensity)
             {
                 packet = DataPoints.GetPoint(i);
 
-                Instantiate(CircleHistoryPrefab, Vector3.zero, Quaternion.identity, FLDataPointsRoot);
-                Instantiate(CircleHistoryPrefab, Vector3.zero, Quaternion.identity, FRDataPointsRoot);
-                Instantiate(CircleHistoryPrefab, Vector3.zero, Quaternion.identity, RLDataPointsRoot);
-                Instantiate(CircleHistoryPrefab, Vector3.zero, Quaternion.identity, RRDataPointsRoot);
+                Transform FLDot = FLDataPointsRoot.GetChild(childIndex);
+                Transform FRDot = FRDataPointsRoot.GetChild(childIndex);
+                Transform RLDot = RLDataPointsRoot.GetChild(childIndex);
+                Transform RRDot = RRDataPointsRoot.GetChild(childIndex);
+
+                Renderer FLRenderer = FLDot.GetComponent<MeshRenderer>();
+                Renderer FRRenderer = FRDot.GetComponent<MeshRenderer>();
+                Renderer RLRenderer = RLDot.GetComponent<MeshRenderer>();
+                Renderer RRRenderer = RRDot.GetComponent<MeshRenderer>();
+
+                if (packet != null)
+                {
+                    FLDot.localPosition = new Vector3(packet.TireSlipAngleFrontLeft, packet.TireSlipRatioFrontLeft, 0) / 2f;
+                    FRDot.localPosition = new Vector3(packet.TireSlipAngleFrontRight, packet.TireSlipRatioFrontRight, 0) / 2f;
+                    RLDot.localPosition = new Vector3(packet.TireSlipAngleRearLeft, packet.TireSlipRatioRearLeft, 0) / 2f;
+                    RRDot.localPosition = new Vector3(packet.TireSlipAngleRearRight, packet.TireSlipRatioRearRight, 0) / 2f;
+
+                    FLRenderer.material.color = TractionCircleHistoryGradient.Evaluate(childIndex / 50f);
+                    FRRenderer.material.color = TractionCircleHistoryGradient.Evaluate(childIndex / 50f);
+                    RLRenderer.material.color = TractionCircleHistoryGradient.Evaluate(childIndex / 50f);
+                    RRRenderer.material.color = TractionCircleHistoryGradient.Evaluate(childIndex / 50f);
+
+                    FLRenderer.sortingOrder = childIndex;
+                    FRRenderer.sortingOrder = childIndex;
+                    RLRenderer.sortingOrder = childIndex;
+                    RRRenderer.sortingOrder = childIndex;
+
+                    FLDot.gameObject.SetActive(true);
+                    FRDot.gameObject.SetActive(true);
+                    RLDot.gameObject.SetActive(true);
+                    RRDot.gameObject.SetActive(true);
+                }
+                else
+                {
+                    FLDot.gameObject.SetActive(false);
+                    FRDot.gameObject.SetActive(false);
+                    RLDot.gameObject.SetActive(false);
+                    RRDot.gameObject.SetActive(false);
+                }
+
+                childIndex++;
             }
         }
-
-        int childIndex = 0;
-
-        for (int i = currentPacketIndex - TractionCircleHistoryCount * TractionCircleHistoryDensity + 1; i <= currentPacketIndex; i += TractionCircleHistoryDensity)
+        else
         {
-            packet = DataPoints.GetPoint(i);
+            LineRenderer FLTractionLine = FLDataPointsRoot.GetComponent<LineRenderer>();
+            LineRenderer FRTractionLine = FRDataPointsRoot.GetComponent<LineRenderer>();
+            LineRenderer RLTractionLine = RLDataPointsRoot.GetComponent<LineRenderer>();
+            LineRenderer RRTractionLine = RRDataPointsRoot.GetComponent<LineRenderer>();
 
-            Transform FL = FLDataPointsRoot.GetChild(childIndex);
-            Transform FR = FRDataPointsRoot.GetChild(childIndex);
-            Transform RL = RLDataPointsRoot.GetChild(childIndex);
-            Transform RR = RRDataPointsRoot.GetChild(childIndex);
+            FLTractionLine.positionCount = TractionCircleHistoryCount;
+            FRTractionLine.positionCount = TractionCircleHistoryCount;
+            RLTractionLine.positionCount = TractionCircleHistoryCount;
+            RRTractionLine.positionCount = TractionCircleHistoryCount;
 
-            Material FLMat = FL.GetComponent<MeshRenderer>().material;
-            Material FRMat = FR.GetComponent<MeshRenderer>().material;
-            Material RLMat = RL.GetComponent<MeshRenderer>().material;
-            Material RRMat = RR.GetComponent<MeshRenderer>().material;
-
-            if (packet != null)
+            for (int i = currentPacketIndex - TractionCircleHistoryCount * TractionCircleHistoryDensity + 1; i <= currentPacketIndex; i += TractionCircleHistoryDensity)
             {
-                FL.localPosition = new Vector3(packet.TireSlipAngleFrontLeft, packet.TireSlipRatioFrontLeft, 0) / 2f;
-                FR.localPosition = new Vector3(packet.TireSlipAngleFrontRight, packet.TireSlipRatioFrontRight, 0) / 2f;
-                RL.localPosition = new Vector3(packet.TireSlipAngleRearLeft, packet.TireSlipRatioRearLeft, 0) / 2f;
-                RR.localPosition = new Vector3(packet.TireSlipAngleRearRight, packet.TireSlipRatioRearRight, 0) / 2f;
+                packet = DataPoints.GetPoint(i);
 
-                FLMat.color = TractionCircleHistoryGradient.Evaluate(childIndex / 50f);
-                FRMat.color = TractionCircleHistoryGradient.Evaluate(childIndex / 50f);
-                RLMat.color = TractionCircleHistoryGradient.Evaluate(childIndex / 50f);
-                RRMat.color = TractionCircleHistoryGradient.Evaluate(childIndex / 50f);
+                if (packet != null)
+                {
+                    FLTractionLine.SetPosition(childIndex, new Vector3(packet.TireSlipAngleFrontLeft, packet.TireSlipRatioFrontLeft, 0) / 2f);
+                    FRTractionLine.SetPosition(childIndex, new Vector3(packet.TireSlipAngleFrontRight, packet.TireSlipRatioFrontRight, 0) / 2f);
+                    RLTractionLine.SetPosition(childIndex, new Vector3(packet.TireSlipAngleRearLeft, packet.TireSlipRatioRearLeft, 0) / 2f);
+                    RRTractionLine.SetPosition(childIndex, new Vector3(packet.TireSlipAngleRearRight, packet.TireSlipRatioRearRight, 0) / 2f);
+                }
 
-                FL.GetComponent<MeshRenderer>().sortingOrder = childIndex;
-                FR.GetComponent<MeshRenderer>().sortingOrder = childIndex;
-                RL.GetComponent<MeshRenderer>().sortingOrder = childIndex;
-                RR.GetComponent<MeshRenderer>().sortingOrder = childIndex;
-
-                FL.gameObject.SetActive(true);
-                FR.gameObject.SetActive(true);
-                RL.gameObject.SetActive(true);
-                RR.gameObject.SetActive(true);
+                childIndex++;
             }
-            else
-            {
-                FL.gameObject.SetActive(false);
-                FR.gameObject.SetActive(false);
-                RL.gameObject.SetActive(false);
-                RR.gameObject.SetActive(false);
-            }
-
-            childIndex++;
         }
     }
 
