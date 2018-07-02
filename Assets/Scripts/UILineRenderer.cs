@@ -98,6 +98,11 @@ namespace UnityEngine.UI.Extensions
             }
         }
 
+        public void Apply()
+        {
+            SetVerticesDirty();
+        }
+
         protected override void OnPopulateMesh(VertexHelper vh)
         {
             if (Points == null)
@@ -122,6 +127,9 @@ namespace UnityEngine.UI.Extensions
                 offsetX += Margin.x / 2f;
                 offsetY += Margin.y / 2f;
             }
+
+            if (vh == null)
+                vh = new VertexHelper();
 
             vh.Clear();
 

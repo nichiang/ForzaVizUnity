@@ -60,6 +60,10 @@ public class Visualizations : MonoBehaviour {
     public Graph FRGraph;
     public Graph RLGraph;
     public Graph RRGraph;
+    public Graph FLUiGraph;
+    public Graph FRUiGraph;
+    public Graph RLUiGraph;
+    public Graph RRUiGraph;
 
     [Header("Traction Circle References")]
     public bool ShowTractionCircleHistory = true;
@@ -209,39 +213,44 @@ public class Visualizations : MonoBehaviour {
         }
 
         DrawTireSuspensionTravel(packet);
+
+        FLUiGraph.AddPoint(1f - packet.NormalizedSuspensionTravelFrontLeft);
+        FRUiGraph.AddPoint(1f - packet.NormalizedSuspensionTravelFrontRight);
+        RLUiGraph.AddPoint(1f - packet.NormalizedSuspensionTravelRearLeft);
+        RRUiGraph.AddPoint(1f - packet.NormalizedSuspensionTravelRearRight);
     }
 
     public void DrawCarVisualizationsAtIndex (int packetIndex)
     {
         ForzaPacket packet;
 
+        List<float> FLSuspensionGraphPoints = new List<float>();
+        List<float> FRSuspensionGraphPoints = new List<float>();
+        List<float> RLSuspensionGraphPoints = new List<float>();
+        List<float> RRSuspensionGraphPoints = new List<float>();
+
+        for (int i = packetIndex; i > packetIndex - suspensionGraphVisiblePoints; i--)
+        {
+            packet = DataPoints.GetPoint(i);
+
+            if (i >= 0)
+            {
+                FLSuspensionGraphPoints.Add(1f - packet.NormalizedSuspensionTravelFrontLeft);
+                FRSuspensionGraphPoints.Add(1f - packet.NormalizedSuspensionTravelFrontRight);
+                RLSuspensionGraphPoints.Add(1f - packet.NormalizedSuspensionTravelRearLeft);
+                RRSuspensionGraphPoints.Add(1f - packet.NormalizedSuspensionTravelRearRight);
+            }
+            else
+            {
+                FLSuspensionGraphPoints.Add(0);
+                FRSuspensionGraphPoints.Add(0);
+                RLSuspensionGraphPoints.Add(0);
+                RRSuspensionGraphPoints.Add(0);
+            }
+        }
+
         if (onCarVizType == OnCarVizType.SuspensionTravel)
         {
-            List<float> FLSuspensionGraphPoints = new List<float>();
-            List<float> FRSuspensionGraphPoints = new List<float>();
-            List<float> RLSuspensionGraphPoints = new List<float>();
-            List<float> RRSuspensionGraphPoints = new List<float>();
-
-            for (int i = packetIndex; i > packetIndex - suspensionGraphVisiblePoints; i--)
-            {
-                packet = DataPoints.GetPoint(i);
-
-                if (i >= 0)
-                {
-                    FLSuspensionGraphPoints.Add(1f - packet.NormalizedSuspensionTravelFrontLeft);
-                    FRSuspensionGraphPoints.Add(1f - packet.NormalizedSuspensionTravelFrontRight);
-                    RLSuspensionGraphPoints.Add(1f - packet.NormalizedSuspensionTravelRearLeft);
-                    RRSuspensionGraphPoints.Add(1f - packet.NormalizedSuspensionTravelRearRight);
-                }
-                else
-                {
-                    FLSuspensionGraphPoints.Add(0);
-                    FRSuspensionGraphPoints.Add(0);
-                    RLSuspensionGraphPoints.Add(0);
-                    RRSuspensionGraphPoints.Add(0);
-                }
-            }
-
             FLGraph.AddPoints(FLSuspensionGraphPoints);
             FRGraph.AddPoints(FRSuspensionGraphPoints);
             RLGraph.AddPoints(RLSuspensionGraphPoints);
@@ -257,6 +266,11 @@ public class Visualizations : MonoBehaviour {
         packet = DataPoints.GetPoint(packetIndex);
 
         DrawTireSuspensionTravel(packet);
+
+        FLUiGraph.AddPoints(FLSuspensionGraphPoints);
+        FRUiGraph.AddPoints(FRSuspensionGraphPoints);
+        RLUiGraph.AddPoints(RLSuspensionGraphPoints);
+        RRUiGraph.AddPoints(RRSuspensionGraphPoints);
     }
 
     void DrawTractionCircles (ForzaPacket packet, int packetIndex = -1)

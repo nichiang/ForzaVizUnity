@@ -1,35 +1,60 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using DigitalRuby.FastLineRenderer;
+using UnityEngine.UI.Extensions;
 
 public class Graph : MonoBehaviour
 {
 
     public LineRenderer lineRenderer;
+    public UILineRenderer uiLineRenderer;
     public int visiblePointsCount = 20;
 
     private Queue<float> dataPoints;
     private float pointOffset;
 
+    private float uiWidth;
+    private float uiHeight;
+
     // Use this for initialization
     void Start()
     {
         dataPoints = new Queue<float>();
-        lineRenderer.positionCount = visiblePointsCount;
-        pointOffset = 2f / visiblePointsCount;
 
-        for (int i = 0; i < visiblePointsCount; i++)
+        if (lineRenderer != null)
         {
-            dataPoints.Enqueue(0);
-            lineRenderer.SetPosition(i, new Vector3(i * pointOffset - 1f, 0, 0));
+            pointOffset = 2f / visiblePointsCount;
+            lineRenderer.positionCount = visiblePointsCount;
+
+            for (int i = 0; i < visiblePointsCount; i++)
+            {
+                dataPoints.Enqueue(0);
+                lineRenderer.SetPosition(i, new Vector3(i * pointOffset - 1f, 0, 0));
+            }
+        }
+        else if (uiLineRenderer != null)
+        {
+            pointOffset = 1f / visiblePointsCount;
+            uiLineRenderer.Points = new Vector2[visiblePointsCount];
+
+            uiWidth = uiLineRenderer.GetComponent<RectTransform>().rect.width;
+            uiHeight = uiLineRenderer.GetComponent<RectTransform>().rect.height;
+
+            for (int i = 0; i < visiblePointsCount; i++)
+            {
+                dataPoints.Enqueue(0);
+                uiLineRenderer.Points[i] = new Vector2(i * pointOffset * uiWidth, 0);
+            }
+
+            uiLineRenderer.Apply();
         }
     }
 
     // Update is called once per frame
     void Update()
     {
-        this.transform.forward = Camera.main.transform.forward;
+        if (lineRenderer != null)
+            this.transform.forward = Camera.main.transform.forward;
     }
 
     public void AddPoint(float point)
@@ -43,11 +68,25 @@ public class Graph : MonoBehaviour
 
         Queue<float>.Enumerator pointsEnum = dataPoints.GetEnumerator();
 
-        for (int i = visiblePointsCount - 1; i >= 0; i--)
+        if (lineRenderer != null)
         {
-            pointsEnum.MoveNext();
-            Vector3 newPoint = new Vector3(1f - i * pointOffset, pointsEnum.Current - 0.5f, 0);
-            lineRenderer.SetPosition(i, newPoint);
+            for (int i = visiblePointsCount - 1; i >= 0; i--)
+            {
+                pointsEnum.MoveNext();
+                Vector3 newPoint = new Vector3(1f - i * pointOffset, pointsEnum.Current - 0.5f, 0);
+                lineRenderer.SetPosition(i, newPoint);
+            }
+        }
+        else if (uiLineRenderer != null)
+        {
+            for (int i = visiblePointsCount - 1; i >= 0; i--)
+            {
+                pointsEnum.MoveNext();
+                Vector3 newPoint = new Vector3((1f - i * pointOffset) * uiWidth, pointsEnum.Current * uiHeight);
+                uiLineRenderer.Points[i] = newPoint;
+            }
+
+            uiLineRenderer.Apply();
         }
     }
 
@@ -65,11 +104,25 @@ public class Graph : MonoBehaviour
 
         Queue<float>.Enumerator pointsEnum = dataPoints.GetEnumerator();
 
-        for (int i = 0; i < visiblePointsCount; i++)
+        if (lineRenderer != null)
         {
-            pointsEnum.MoveNext();
-            Vector3 newPoint = new Vector3(1f - i * pointOffset, pointsEnum.Current - 0.5f, 0);
-            lineRenderer.SetPosition(i, newPoint);
+            for (int i = 0; i < visiblePointsCount; i++)
+            {
+                pointsEnum.MoveNext();
+                Vector3 newPoint = new Vector3(1f - i * pointOffset, pointsEnum.Current - 0.5f, 0);
+                lineRenderer.SetPosition(i, newPoint);
+            }
+        }
+        else if (uiLineRenderer != null)
+        {
+            for (int i = 0; i < visiblePointsCount; i++)
+            {
+                pointsEnum.MoveNext();
+                Vector3 newPoint = new Vector3((1f - i * pointOffset) * uiWidth, pointsEnum.Current * uiHeight);
+                uiLineRenderer.Points[i] = newPoint;
+            }
+
+            uiLineRenderer.Apply();
         }
     }
 }
