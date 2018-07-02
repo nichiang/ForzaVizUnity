@@ -176,12 +176,6 @@ public class Visualizations : MonoBehaviour {
             DrawCarVisualizations(packet);
         }
 
-        lastGo = node;
-        lastPoint = node.transform.position;
-        lastTimestamp = packet.TimestampMS;
-
-        trackInfo.FindLap(node);
-
         //ElevationViz(node);
 
         if (trailVisualizationType == TrailVizType.Line)
@@ -192,7 +186,12 @@ public class Visualizations : MonoBehaviour {
         {
             GForceViz(packet, node, frameTick);
         }
-        
+
+        lastGo = node;
+        lastPoint = node.transform.position;
+        lastTimestamp = packet.TimestampMS;
+
+        trackInfo.FindLap(node);
     }
 
     void DrawCarVisualizations (ForzaPacket packet)
@@ -417,15 +416,31 @@ public class Visualizations : MonoBehaviour {
     {
         float gforce = packet.AccelerationZ / 9.80665f;
 
+        /*
         FastLineRendererProperties lineRendererProps = new FastLineRendererProperties
         {
             Start = go.transform.position,
-            Radius = 0.1f,
-            Color = gForceGradient.Evaluate(gforce  * 0.5f + 0.5f),
-            LineJoin = FastLineRendererLineJoin.AttachToPrevious
+            Radius = 0.2f,
+            Color = gForceGradient.Evaluate(gforce * 0.5f + 0.5f),
+            LineJoin = FastLineRendererLineJoin.AdjustPosition
         };
 
         lineTrailRenderer.AppendLine(lineRendererProps);
+        */
+
+        FastLineRendererProperties lineRendererProps = new FastLineRendererProperties
+        {
+            Start = lastPoint,
+            End = go.transform.position,
+            Radius = 0.5f,
+            Color = gForceGradient.Evaluate(gforce * 0.5f + 0.5f),
+            LineJoin = FastLineRendererLineJoin.AttachToPrevious
+        };
+
+        Vector3 pointAverage = Vector3.Lerp(lineRendererProps.Start, lineRendererProps.End, 0.5f);
+
+        lineTrailRenderer.AppendCurve(lineRendererProps, pointAverage, pointAverage, 6, false, false, 0);
+
         lineTrailRenderer.Apply();
     }
 

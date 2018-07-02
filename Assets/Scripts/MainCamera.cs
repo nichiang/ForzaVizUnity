@@ -152,7 +152,8 @@ public class MainCamera : MonoBehaviour {
                 gimbal.eulerAngles.y + yawDelta, 
                 0);
 
-            gimbal.eulerAngles = newRotation;
+            if (newRotation.x > 270 || newRotation.x < 90)
+                gimbal.eulerAngles = newRotation;
 
             lastMousePosition = Input.mousePosition;
         }
