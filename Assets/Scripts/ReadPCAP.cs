@@ -17,6 +17,7 @@ public class ReadPCAP : MonoBehaviour {
     private int packetCount = 0;
 
     private Thread listener;
+    private UInt32 lastTimestamp = 0;
 
     // Use this for initialization
 	void Start () {
@@ -65,8 +66,6 @@ public class ReadPCAP : MonoBehaviour {
             {
                 // Blocks until a message returns on this socket from a remote host.
                 Byte[] receiveBytes = receivingUdpClient.Receive(ref RemoteIpEndPoint);
-
-                packetCount++;
 
                 int index = 0;
 
@@ -147,6 +146,18 @@ public class ReadPCAP : MonoBehaviour {
                     DrivetrainType = BitConverter.ToInt32(receiveBytes, index += 4), //Corresponds to EDrivetrainType; 0 = FWD, 1 = RWD, 2 = AWD
                     NumCylinders = BitConverter.ToInt32(receiveBytes, index += 4) //Number of cylinders in the engine
                 };
+
+                if (packet.TimestampMS == lastTimestamp)
+                {
+                    Debug.Log("Same packet received, dropping.");
+                    continue;
+                }
+                else
+                {
+                    lastTimestamp = packet.TimestampMS;
+                }
+
+                packetCount++;
 
                 if (packet.IsRaceOn == 1)
                 {

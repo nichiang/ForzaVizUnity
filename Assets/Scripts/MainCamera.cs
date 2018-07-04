@@ -191,6 +191,9 @@ public class MainCamera : MonoBehaviour {
             graphAnchor.UpdatePosition();
             tractionCircleAnchor.UpdatePosition();
 
+            //if (currentNode != null)
+                //DebugConsole.Write("Current position: " + node.transform.position + ", Last position: " + currentNode.transform.position);
+
             currentNode = node;
         }
     }

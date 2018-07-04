@@ -39,7 +39,8 @@ public class Visualizations : MonoBehaviour {
     public int suspensionGraphVisiblePoints = 20;
 
     [Header("Line Trail")]
-    public FastLineRenderer lineTrailRenderer;
+    public float lineTrailWidth = 1f;
+    public Material lineMaterial;
 
     [Header("G Force")]
     public Gradient gForceGradient;
@@ -93,6 +94,10 @@ public class Visualizations : MonoBehaviour {
     private MainCamera mainCamera;
     private TrackInfo trackInfo;
 
+    private List<Mesh> lineMeshes = new List<Mesh>();
+    private List<Color> lineMeshesColor = new List<Color>();
+    private MaterialPropertyBlock lineMeshesMatProps;
+
     private GameObject lastGo;
     private Vector3 lastPoint;
     private UInt32 lastTimestamp = 0;
@@ -127,6 +132,18 @@ public class Visualizations : MonoBehaviour {
         FRDataPointsRoot = FRCircle.transform.parent.GetChild(1);
         RLDataPointsRoot = RLCircle.transform.parent.GetChild(1);
         RRDataPointsRoot = RRCircle.transform.parent.GetChild(1);
+
+        lineMeshesMatProps = new MaterialPropertyBlock();
+    }
+
+    void Update ()
+    {
+        for (int i = 0; i < lineMeshes.Count; i++)
+        {
+            lineMeshesMatProps.SetColor("_Color", lineMeshesColor[i]);
+
+            Graphics.DrawMesh(lineMeshes[i], Matrix4x4.identity, lineMaterial, 0, null, 0, lineMeshesMatProps, false);
+        }
     }
 
     public void DrawTrail (ForzaPacket packet)
@@ -229,6 +246,12 @@ public class Visualizations : MonoBehaviour {
         List<float> RLSuspensionGraphPoints = new List<float>();
         List<float> RRSuspensionGraphPoints = new List<float>();
 
+        /*
+        if (packetIndex > 0)
+            Debug.Log("\nLine trail mesh vertices: " + lineMeshes[packetIndex].vertices[0] + ", " + lineMeshes[packetIndex].vertices[1] + ", " + lineMeshes[packetIndex].vertices[2] + ", " + lineMeshes[packetIndex].vertices[3]
+                    + " | Distance between points: " + Vector3.Distance(dataRoot.GetChild(packetIndex).position, dataRoot.GetChild(packetIndex - 1).position)
+                    + " | Difference between packet timestamps: " + (DataPoints.GetPoint(packetIndex).TimestampMS - DataPoints.GetPoint(packetIndex - 1).TimestampMS));
+*/
         for (int i = packetIndex; i > packetIndex - suspensionGraphVisiblePoints; i--)
         {
             packet = DataPoints.GetPoint(i);
@@ -429,33 +452,44 @@ public class Visualizations : MonoBehaviour {
     void LineTrailViz (ForzaPacket packet, GameObject go)
     {
         float gforce = packet.AccelerationZ / 9.80665f;
+        Vector3 currPoint = go.transform.position;
 
-        /*
-        FastLineRendererProperties lineRendererProps = new FastLineRendererProperties
+        Mesh line = new Mesh();
+
+        Vector3 offset = new Vector3(lastPoint.z - currPoint.z, 0, currPoint.x - lastPoint.x).normalized * lineTrailWidth / 2f;
+    
+        Vector3[] vertices = new Vector3[4];
+
+        if (lineMeshes.Count == 0)
         {
-            Start = go.transform.position,
-            Radius = 0.2f,
-            Color = gForceGradient.Evaluate(gforce * 0.5f + 0.5f),
-            LineJoin = FastLineRendererLineJoin.AdjustPosition
-        };
-
-        lineTrailRenderer.AppendLine(lineRendererProps);
-        */
-
-        FastLineRendererProperties lineRendererProps = new FastLineRendererProperties
+            vertices[0] = lastPoint - offset;
+            vertices[1] = lastPoint + offset;
+        }
+        else
         {
-            Start = lastPoint,
-            End = go.transform.position,
-            Radius = 0.5f,
-            Color = gForceGradient.Evaluate(gforce * 0.5f + 0.5f),
-            LineJoin = FastLineRendererLineJoin.AttachToPrevious
-        };
+            vertices[0] = lineMeshes[lineMeshes.Count - 1].vertices[2];
+            vertices[1] = lineMeshes[lineMeshes.Count - 1].vertices[3];
+        }
 
-        Vector3 pointAverage = Vector3.Lerp(lineRendererProps.Start, lineRendererProps.End, 0.5f);
+        vertices[2] = currPoint - offset;
+        vertices[3] = currPoint + offset;
 
-        lineTrailRenderer.AppendCurve(lineRendererProps, pointAverage, pointAverage, 6, false, false, 0);
+        line.vertices = vertices;
 
-        lineTrailRenderer.Apply();
+        //Debug.Log(vertices[0] + ", " + vertices[1] + ", " + vertices[2] + ", " + vertices[3]);
+
+        Vector2[] uvs = new Vector2[4];
+        uvs[0] = new Vector2(0, 0);
+        uvs[1] = new Vector2(1, 0);
+        uvs[2] = new Vector2(2, 1);
+        uvs[3] = new Vector2(3, 1);
+        line.uv = uvs;
+
+        int[] triangles = { 0, 1, 2, 3, 2, 1 };
+        line.triangles = triangles;
+
+        lineMeshes.Add(line);
+        lineMeshesColor.Add(gForceGradient.Evaluate(gforce * 0.5f + 0.5f));
     }
 
     void GForceViz (ForzaPacket packet, GameObject go, float frameTick)
