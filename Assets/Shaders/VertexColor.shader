@@ -1,23 +1,37 @@
-﻿Shader "Unlit/VertexColor" {
+﻿Shader "Custom/VertexColorUnlit" {
+
 	Properties{
-		_MainTex("Texture", 2D) = "white" {}
+
 	}
+
+
 
 	Category{
+
 		Tags{ "Queue" = "Geometry" }
+
 		Lighting Off
+
 		BindChannels{
+
 		Bind "Color", color
+
 		Bind "Vertex", vertex
+
 		Bind "TexCoord", texcoord
+
 	}
 
-	SubShader{
+
+
+		SubShader{
+
 		Pass{
-			SetTexture[_MainTex]{
-				Combine texture * primary DOUBLE
-			}
-		}
+			Cull Off
 	}
+
 	}
+
+	}
+
 }

@@ -94,9 +94,9 @@ public class Visualizations : MonoBehaviour {
     private MainCamera mainCamera;
     private TrackInfo trackInfo;
 
-    private List<Mesh> lineMeshes = new List<Mesh>();
-    private List<Color> lineMeshesColor = new List<Color>();
-    private MaterialPropertyBlock lineMeshesMatProps;
+    private List<Vector3> lineMeshVertices = new List<Vector3>();
+    private List<int> lineMeshTriangles = new List<int>();
+    private List<Color> lineMeshColours = new List<Color>();
 
     private GameObject lastGo;
     private Vector3 lastPoint;
@@ -132,18 +132,16 @@ public class Visualizations : MonoBehaviour {
         FRDataPointsRoot = FRCircle.transform.parent.GetChild(1);
         RLDataPointsRoot = RLCircle.transform.parent.GetChild(1);
         RRDataPointsRoot = RRCircle.transform.parent.GetChild(1);
-
-        lineMeshesMatProps = new MaterialPropertyBlock();
     }
 
     void Update ()
     {
-        for (int i = 0; i < lineMeshes.Count; i++)
-        {
-            lineMeshesMatProps.SetColor("_Color", lineMeshesColor[i]);
+        Mesh lineMesh = new Mesh();
+        lineMesh.SetVertices(lineMeshVertices);
+        lineMesh.SetTriangles(lineMeshTriangles, 0);
+        lineMesh.SetColors(lineMeshColours);
 
-            Graphics.DrawMesh(lineMeshes[i], Matrix4x4.identity, lineMaterial, 0, null, 0, lineMeshesMatProps, false);
-        }
+        Graphics.DrawMesh(lineMesh, Matrix4x4.identity, lineMaterial, 0);
     }
 
     public void DrawTrail (ForzaPacket packet)
@@ -453,43 +451,36 @@ public class Visualizations : MonoBehaviour {
     {
         float gforce = packet.AccelerationZ / 9.80665f;
         Vector3 currPoint = go.transform.position;
-
-        Mesh line = new Mesh();
-
+        Color gforceColour;
         Vector3 offset = new Vector3(lastPoint.z - currPoint.z, 0, currPoint.x - lastPoint.x).normalized * lineTrailWidth / 2f;
-    
-        Vector3[] vertices = new Vector3[4];
 
-        if (lineMeshes.Count == 0)
+        if (lineMeshVertices.Count == 0)
         {
-            vertices[0] = lastPoint - offset;
-            vertices[1] = lastPoint + offset;
-        }
-        else
-        {
-            vertices[0] = lineMeshes[lineMeshes.Count - 1].vertices[2];
-            vertices[1] = lineMeshes[lineMeshes.Count - 1].vertices[3];
+            lineMeshVertices.Add(lastPoint - offset);
+            lineMeshVertices.Add(lastPoint + offset);
+
+            gforceColour = gForceGradient.Evaluate(0.5f);
+
+            lineMeshColours.Add(gforceColour);
+            lineMeshColours.Add(gforceColour);
         }
 
-        vertices[2] = currPoint - offset;
-        vertices[3] = currPoint + offset;
+        lineMeshVertices.Add(currPoint - offset);
+        lineMeshVertices.Add(currPoint + offset);
 
-        line.vertices = vertices;
+        int vertexCount = lineMeshVertices.Count;
 
-        //Debug.Log(vertices[0] + ", " + vertices[1] + ", " + vertices[2] + ", " + vertices[3]);
+        lineMeshTriangles.Add(vertexCount - 4);
+        lineMeshTriangles.Add(vertexCount - 3);
+        lineMeshTriangles.Add(vertexCount - 2);
+        lineMeshTriangles.Add(vertexCount - 1);
+        lineMeshTriangles.Add(vertexCount - 2);
+        lineMeshTriangles.Add(vertexCount - 3);
 
-        Vector2[] uvs = new Vector2[4];
-        uvs[0] = new Vector2(0, 0);
-        uvs[1] = new Vector2(1, 0);
-        uvs[2] = new Vector2(2, 1);
-        uvs[3] = new Vector2(3, 1);
-        line.uv = uvs;
+        gforceColour = gForceGradient.Evaluate(gforce * 0.5f + 0.5f);
 
-        int[] triangles = { 0, 1, 2, 3, 2, 1 };
-        line.triangles = triangles;
-
-        lineMeshes.Add(line);
-        lineMeshesColor.Add(gForceGradient.Evaluate(gforce * 0.5f + 0.5f));
+        lineMeshColours.Add(gforceColour);
+        lineMeshColours.Add(gforceColour);
     }
 
     void GForceViz (ForzaPacket packet, GameObject go, float frameTick)
