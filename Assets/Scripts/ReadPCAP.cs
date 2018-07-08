@@ -42,9 +42,9 @@ public class ReadPCAP : MonoBehaviour {
 
             if (packetQueue.TryDequeue(out packet))
             {
-                DataPoints.AddPoint(packet);
+                DataPoint newPoint = DataPoints.AddPoint(packet);
 
-                visualizations.DrawTrail(packet);
+                visualizations.DrawTrail(newPoint);
                 uiVisualizations.DrawUI(packet);
             }
         }

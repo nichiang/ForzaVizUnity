@@ -98,9 +98,11 @@ public class Visualizations : MonoBehaviour {
     private List<int> lineMeshTriangles = new List<int>();
     private List<Color> lineMeshColours = new List<Color>();
 
+    /*
     private GameObject lastGo;
     private Vector3 lastPoint;
     private UInt32 lastTimestamp = 0;
+    */
 
     void Start ()
     {
@@ -144,19 +146,8 @@ public class Visualizations : MonoBehaviour {
         Graphics.DrawMesh(lineMesh, Matrix4x4.identity, lineMaterial, 0);
     }
 
-    public void DrawTrail (ForzaPacket packet)
+    public void DrawTrail (DataPoint p)
     {
-        if (lastTimestamp == 0)
-        {
-            lastPoint = new Vector3(0, 0, 0);
-            lastTimestamp = packet.TimestampMS - 16; // 16 represents one frame at 60 fps
-        }
-
-        float frameTick = (packet.TimestampMS - lastTimestamp) / 1000f;
-
-
-        // Setting car position
-
         GameObject trailPrefab = genericTrailPrefab;
 
         switch (trailVisualizationType)
@@ -171,46 +162,34 @@ public class Visualizations : MonoBehaviour {
                 trailPrefab = gforceVizTrailPrefab;
                 break;
         }
-
+        
         GameObject node = Instantiate(trailPrefab);
+        node.transform.position = p.GetPosition();
+        node.transform.rotation = p.GetRotation();
         node.transform.SetParent(dataRoot);
-        node.transform.position = lastPoint;
-
-        node.transform.eulerAngles = new Vector3(Mathf.Rad2Deg * packet.Pitch, Mathf.Rad2Deg * packet.Yaw, Mathf.Rad2Deg * packet.Roll);
-
-        node.transform.Translate(
-            packet.VelocityX * frameTick,
-            packet.VelocityY * frameTick,
-            packet.VelocityZ * frameTick,
-            Space.Self
-        );
-
+        
         if (!ShowElevation)
             node.transform.position = new Vector3(node.transform.position.x, 0, node.transform.position.z);
 
         if (mainCamera.IsFollowing())
         {
-            mainCamera.FollowCurrentPoint(node);
+            mainCamera.FollowCurrentPoint(DataPoints.GetLatestPacketIndex());
 
-            DrawCarVisualizations(packet);
+            DrawCarVisualizations(p.GetPacket());
         }
 
         //ElevationViz(node);
 
         if (trailVisualizationType == TrailVizType.Line)
         {
-            LineTrailViz(packet, node);
+            LineTrailViz();
         }
         else if (trailVisualizationType == TrailVizType.GForce)
         {
-            GForceViz(packet, node, frameTick);
+            GForceViz(p.GetPacket(), node);
         }
 
-        lastGo = node;
-        lastPoint = node.transform.position;
-        lastTimestamp = packet.TimestampMS;
-
-        trackInfo.FindLap(node);
+        trackInfo.FindLap(DataPoints.GetLatestPacketIndex());
     }
 
     void DrawCarVisualizations (ForzaPacket packet)
@@ -252,7 +231,7 @@ public class Visualizations : MonoBehaviour {
 */
         for (int i = packetIndex; i > packetIndex - suspensionGraphVisiblePoints; i--)
         {
-            packet = DataPoints.GetPoint(i);
+            packet = DataPoints.GetPoint(i).GetPacket();
 
             if (i >= 0)
             {
@@ -279,12 +258,12 @@ public class Visualizations : MonoBehaviour {
         }
         else if (onCarVizType == OnCarVizType.TractionCircle)
         {
-            packet = DataPoints.GetPoint(packetIndex);
+            packet = DataPoints.GetPoint(packetIndex).GetPacket();
 
             DrawTractionCircles(packet, packetIndex);
         }
 
-        packet = DataPoints.GetPoint(packetIndex);
+        packet = DataPoints.GetPoint(packetIndex).GetPacket();
 
         DrawTireSuspensionTravel(packet);
 
@@ -313,14 +292,14 @@ public class Visualizations : MonoBehaviour {
 
         if (ShowTractionCircleHistory)
         {
-            if (DataPoints.GetCurrentPacketIndex() % TractionCircleHistoryDensity == 0) // Run every n-th time
+            if (DataPoints.GetLatestPacketIndex() % TractionCircleHistoryDensity == 0) // Run every n-th time
                 DrawTractionCircleHistory(packetIndex);
         }
     }
 
     void DrawTractionCircleHistory (int packetIndex = -1)
     {
-        int currentPacketIndex = packetIndex == -1 ? DataPoints.GetCurrentPacketIndex() : packetIndex;
+        int currentPacketIndex = packetIndex == -1 ? DataPoints.GetLatestPacketIndex() : packetIndex;
         ForzaPacket packet;
         int childIndex = 0;
 
@@ -339,7 +318,7 @@ public class Visualizations : MonoBehaviour {
 
             for (int i = currentPacketIndex - TractionCircleHistoryCount * TractionCircleHistoryDensity + 1; i <= currentPacketIndex; i += TractionCircleHistoryDensity)
             {
-                packet = DataPoints.GetPoint(i);
+                packet = DataPoints.GetPoint(i) != null ? DataPoints.GetPoint(i).GetPacket() : null;
 
                 Transform FLDot = FLDataPointsRoot.GetChild(childIndex);
                 Transform FRDot = FRDataPointsRoot.GetChild(childIndex);
@@ -398,7 +377,7 @@ public class Visualizations : MonoBehaviour {
 
             for (int i = currentPacketIndex - TractionCircleHistoryCount * TractionCircleHistoryDensity + 1; i <= currentPacketIndex; i += TractionCircleHistoryDensity)
             {
-                packet = DataPoints.GetPoint(i);
+                packet = DataPoints.GetPoint(i).GetPacket();
 
                 if (packet != null)
                 {
@@ -447,10 +426,14 @@ public class Visualizations : MonoBehaviour {
         }
     }
 
-    void LineTrailViz (ForzaPacket packet, GameObject go)
+    void LineTrailViz ()
     {
-        float gforce = packet.AccelerationZ / 9.80665f;
-        Vector3 currPoint = go.transform.position;
+        if (DataPoints.GetLatestPacketIndex() <= 1)
+            return;
+
+        float gforce = DataPoints.GetCurrentPoint().GetPacket().AccelerationZ / 9.80665f;
+        Vector3 currPoint = DataPoints.GetCurrentPoint().GetPosition();
+        Vector3 lastPoint = DataPoints.GetPrevPoint().GetPosition();
         Color gforceColour;
         Vector3 offset = new Vector3(lastPoint.z - currPoint.z, 0, currPoint.x - lastPoint.x).normalized * lineTrailWidth / 2f;
 
@@ -483,7 +466,7 @@ public class Visualizations : MonoBehaviour {
         lineMeshColours.Add(gforceColour);
     }
 
-    void GForceViz (ForzaPacket packet, GameObject go, float frameTick)
+    void GForceViz (ForzaPacket packet, GameObject go)
     {
         Transform arrow = go.transform.GetChild(0);
 
@@ -500,10 +483,5 @@ public class Visualizations : MonoBehaviour {
         Vector3 scaleArrow = arrow.transform.localScale;
         scaleArrow.z *= gforce;
         arrow.transform.localScale = scaleArrow;
-    }
-
-    public GameObject CurrentPoint ()
-    {
-        return lastGo;
     }
 }

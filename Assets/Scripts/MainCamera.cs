@@ -13,11 +13,12 @@ public class MainCamera : MonoBehaviour {
     public CarVizAnchor graphAnchor, tractionCircleAnchor;
 
     private Camera mainCamera;
-    private GameObject currentNode;
+    private DataPoint lastPoint;
     private Vector3 lastMousePosition;
 
     private bool followMode = true;
     private int stepThroughMultiplier = 1;
+    private int currentFollowIndex = 0;
 
     private int prevStepCount = 0;
     private int nextStepCount = 0;
@@ -33,16 +34,15 @@ public class MainCamera : MonoBehaviour {
         // Go backwards
 		if (Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S))
         {
-            if (currentNode != null)
+            if (lastPoint != null)
             {
-                int prevIndex = currentNode.transform.GetSiblingIndex() - stepThroughMultiplier;
+                int prevIndex = currentFollowIndex - stepThroughMultiplier;
 
                 if (prevIndex >= 0)
                 {
                     followMode = false;
 
-                    GameObject prevSibling = currentNode.transform.parent.GetChild(prevIndex).gameObject;
-                    FollowCurrentPoint(prevSibling, true, Direction.backward);
+                    FollowCurrentPoint(prevIndex, true, Direction.backward);
                     visualizations.DrawCarVisualizationsAtIndex(prevIndex);
                     uiVisualizations.DrawUIAtIndex(prevIndex);
                 }
@@ -58,16 +58,15 @@ public class MainCamera : MonoBehaviour {
         // Go forward
         else if (Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W))
         {
-            if (currentNode != null)
+            if (lastPoint != null)
             {
-                int nextIndex = currentNode.transform.GetSiblingIndex() + stepThroughMultiplier;
+                int nextIndex = currentFollowIndex + stepThroughMultiplier;
 
-                if (nextIndex < currentNode.transform.parent.childCount)
+                if (nextIndex <= DataPoints.GetLatestPacketIndex())
                 {
                     followMode = false;
 
-                    GameObject prevSibling = currentNode.transform.parent.GetChild(nextIndex).gameObject;
-                    FollowCurrentPoint(prevSibling, true, Direction.forward);
+                    FollowCurrentPoint(nextIndex, true, Direction.forward);
                     visualizations.DrawCarVisualizationsAtIndex(nextIndex);
                     uiVisualizations.DrawUIAtIndex(nextIndex);
                 }
@@ -87,7 +86,7 @@ public class MainCamera : MonoBehaviour {
 
             if (followMode)
             {
-                int currentIndex = visualizations.CurrentPoint().transform.GetSiblingIndex();
+                int currentIndex = DataPoints.GetLatestPacketIndex();
                 visualizations.DrawCarVisualizationsAtIndex(currentIndex);
                 uiVisualizations.DrawUIAtIndex(currentIndex);
                 visualizations.ShowElevationLines(true);
@@ -103,8 +102,8 @@ public class MainCamera : MonoBehaviour {
         {
             followMode = false;
 
-            GameObject firstSibling = currentNode.transform.parent.GetChild(0).gameObject;
-            FollowCurrentPoint(firstSibling, true, Direction.forward);
+            //GameObject firstSibling = lastPoint.transform.parent.GetChild(0).gameObject;
+            FollowCurrentPoint(0, true, Direction.forward);
 
             prevStepCount = 0;
             nextStepCount = 0;
@@ -164,16 +163,17 @@ public class MainCamera : MonoBehaviour {
         return followMode;
     }
 
-    public void FollowCurrentPoint (GameObject node, bool force = false, Direction dir = Direction.forward)
+    public void FollowCurrentPoint (int pointIndex, bool force = false, Direction dir = Direction.forward)
     {
         if (followMode || force)
         {
+            DataPoint p = DataPoints.GetPoint(pointIndex);
             Transform t = mainCamera.transform.root;
-            t.position = node.transform.position;
+            t.position = p.GetPosition();
 
-            if (currentNode != null)
+            if (lastPoint != null)
             {
-                Vector3 pathForwardDirection = node.transform.position - currentNode.transform.position;
+                Vector3 pathForwardDirection = p.GetPosition() - lastPoint.GetPosition();
                 pathForwardDirection.y = 0;
 
                 if (dir == Direction.backward)
@@ -185,22 +185,20 @@ public class MainCamera : MonoBehaviour {
                 }
             }
 
-            car.transform.position = node.transform.position;
-            car.transform.rotation = node.transform.rotation;
+            car.transform.position = p.GetPosition();
+            car.transform.rotation = p.GetRotation();
 
             graphAnchor.UpdatePosition();
             tractionCircleAnchor.UpdatePosition();
 
-            //if (currentNode != null)
-                //DebugConsole.Write("Current position: " + node.transform.position + ", Last position: " + currentNode.transform.position);
-
-            currentNode = node;
+            currentFollowIndex = pointIndex;
+            lastPoint = p;
         }
     }
 
-    public void GoToPoint (GameObject node)
+    public void GoToPoint (int pointIndex)
     {
         followMode = false;
-        FollowCurrentPoint(node, true, Direction.forward);
+        FollowCurrentPoint(pointIndex, true, Direction.forward);
     }
 }

@@ -8,8 +8,7 @@ public class TrackInfo : MonoBehaviour {
     public float searchDistance = 20f;
 
     private MainCamera mainCamera;
-    private Transform dataPointsRoot;
-    private List<GameObject> lapStartingPoints;
+    private List<int> lapStartingPoints = new List<int>();
 
     private float currentLapIndex = 0;
     private float lastDistance = float.MaxValue;
@@ -18,8 +17,6 @@ public class TrackInfo : MonoBehaviour {
     void Start ()
     {
         mainCamera = Camera.main.GetComponent<MainCamera>();
-        lapStartingPoints = new List<GameObject>();
-        dataPointsRoot = visualizations.gameObject.transform;
     }
 
     void Update ()
@@ -30,7 +27,7 @@ public class TrackInfo : MonoBehaviour {
             {
                 for (int i = lapStartingPoints.Count - 1; i >= 0; i--)
                 {
-                    if (visualizations.CurrentPoint().transform.GetSiblingIndex() > lapStartingPoints[i].transform.GetSiblingIndex())
+                    if (DataPoints.GetLatestPacketIndex() > lapStartingPoints[i])
                     {
                         mainCamera.GoToPoint(lapStartingPoints[i]);
                         break;
@@ -46,7 +43,7 @@ public class TrackInfo : MonoBehaviour {
 
                 for (int i = 0; i < lapStartingPoints.Count; i++)
                 {
-                    if (visualizations.CurrentPoint().transform.GetSiblingIndex() < lapStartingPoints[i].transform.GetSiblingIndex())
+                    if (DataPoints.GetLatestPacketIndex() < lapStartingPoints[i])
                     {
                         mainCamera.GoToPoint(lapStartingPoints[i]);
                         goToEnd = false;
@@ -56,21 +53,21 @@ public class TrackInfo : MonoBehaviour {
 
                 if (goToEnd)
                 {
-                    mainCamera.GoToPoint(dataPointsRoot.GetChild(dataPointsRoot.childCount - 1).gameObject);
+                    mainCamera.GoToPoint(DataPoints.GetLatestPacketIndex());
                 }
             }
         }
     }
 
-    public void FindLap (GameObject go)
+    public void FindLap (int packetIndex)
     {
-        if (lapStartingPoints.Count == 0 && dataPointsRoot.childCount > 0)
+        if (lapStartingPoints.Count == 0 && DataPoints.GetLatestPacketIndex() >= 0)
         {
-            lapStartingPoints.Add(dataPointsRoot.GetChild(0).gameObject);
+            lapStartingPoints.Add(0);
         }
 
-        Vector3 firstPointPosition = dataPointsRoot.GetChild(0).position;
-        float distance = Vector3.Distance(firstPointPosition, go.transform.position);
+        Vector3 firstPointPosition = DataPoints.GetPoint(0).GetPosition();
+        float distance = Vector3.Distance(firstPointPosition, DataPoints.GetPoint(packetIndex).GetPosition());
 
         if (distance >= searchDistance)
         {
@@ -85,8 +82,8 @@ public class TrackInfo : MonoBehaviour {
             }
             else
             {
-                Debug.Log("Lap recorded, node position: " + go.transform.position);
-                lapStartingPoints.Add(go);
+                Debug.Log("Lap recorded, node position: " + packetIndex);
+                lapStartingPoints.Add(packetIndex);
                 lastDistance = float.MaxValue;
                 startingLap = true;
                 currentLapIndex += 1f;

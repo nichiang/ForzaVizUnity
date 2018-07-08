@@ -26,7 +26,7 @@ public class UIVisualizations : MonoBehaviour {
 
     public void DrawUIAtIndex (int packetIndex)
     {
-        ForzaPacket packet = DataPoints.GetPoint(packetIndex);
+        ForzaPacket packet = DataPoints.GetPoint(packetIndex).GetPacket();
 
         speed.text = Mathf.RoundToInt(packet.VelocityZ * 2.237f).ToString();
     }
