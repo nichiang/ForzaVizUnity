@@ -44,7 +44,7 @@ public class ReadPCAP : MonoBehaviour {
             {
                 DataPoint newPoint = DataPoints.AddPoint(packet);
 
-                visualizations.DrawTrail(newPoint);
+                visualizations.DrawVisualizations(newPoint);
                 uiVisualizations.DrawUI(packet);
             }
         }

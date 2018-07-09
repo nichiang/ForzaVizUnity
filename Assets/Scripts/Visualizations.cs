@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Rendering;
 using DigitalRuby.FastLineRenderer;
 
 public class Visualizations : MonoBehaviour {
@@ -98,12 +97,6 @@ public class Visualizations : MonoBehaviour {
     private List<int> lineMeshTriangles = new List<int>();
     private List<Color> lineMeshColours = new List<Color>();
 
-    /*
-    private GameObject lastGo;
-    private Vector3 lastPoint;
-    private UInt32 lastTimestamp = 0;
-    */
-
     void Start ()
     {
         mainCamera = Camera.main.GetComponent<MainCamera>();
@@ -138,15 +131,18 @@ public class Visualizations : MonoBehaviour {
 
     void Update ()
     {
-        Mesh lineMesh = new Mesh();
-        lineMesh.SetVertices(lineMeshVertices);
-        lineMesh.SetTriangles(lineMeshTriangles, 0);
-        lineMesh.SetColors(lineMeshColours);
+        if (lineMeshVertices.Count > 0)
+        {
+            Mesh lineMesh = new Mesh();
+            lineMesh.SetVertices(lineMeshVertices);
+            lineMesh.SetTriangles(lineMeshTriangles, 0);
+            lineMesh.SetColors(lineMeshColours);
 
-        Graphics.DrawMesh(lineMesh, Matrix4x4.identity, lineMaterial, 0);
+            Graphics.DrawMesh(lineMesh, Matrix4x4.identity, lineMaterial, 0);
+        }
     }
 
-    public void DrawTrail (DataPoint p)
+    public void DrawVisualizations (DataPoint p)
     {
         GameObject trailPrefab = genericTrailPrefab;
 
@@ -231,6 +227,9 @@ public class Visualizations : MonoBehaviour {
 */
         for (int i = packetIndex; i > packetIndex - suspensionGraphVisiblePoints; i--)
         {
+            if (!DataPoints.IsValidIndex(i))
+                continue;
+
             packet = DataPoints.GetPoint(i).GetPacket();
 
             if (i >= 0)
@@ -318,7 +317,10 @@ public class Visualizations : MonoBehaviour {
 
             for (int i = currentPacketIndex - TractionCircleHistoryCount * TractionCircleHistoryDensity + 1; i <= currentPacketIndex; i += TractionCircleHistoryDensity)
             {
-                packet = DataPoints.GetPoint(i) != null ? DataPoints.GetPoint(i).GetPacket() : null;
+                if (!DataPoints.IsValidIndex(i))
+                    continue;
+
+                packet = DataPoints.GetPoint(i).GetPacket();
 
                 Transform FLDot = FLDataPointsRoot.GetChild(childIndex);
                 Transform FRDot = FRDataPointsRoot.GetChild(childIndex);
