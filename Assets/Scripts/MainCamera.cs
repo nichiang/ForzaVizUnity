@@ -201,4 +201,20 @@ public class MainCamera : MonoBehaviour {
         followMode = false;
         FollowCurrentPoint(pointIndex, true, Direction.forward);
     }
+
+    public void ResetCamera ()
+    {
+        car.transform.position = Vector3.zero;
+        car.transform.rotation = Quaternion.identity;
+
+        Transform t = mainCamera.transform;
+
+        t.root.position = Vector3.zero;
+        t.root.forward = car.transform.forward;
+        t.parent.localEulerAngles = cameraFollowPosition;
+        mainCamera.fieldOfView = 60f;
+
+        graphAnchor.UpdatePosition();
+        tractionCircleAnchor.UpdatePosition();
+    }
 }

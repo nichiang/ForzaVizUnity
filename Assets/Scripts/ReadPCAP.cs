@@ -21,19 +21,26 @@ public class ReadPCAP : MonoBehaviour {
 
     // Use this for initialization
 	void Start () {
-        packetQueue = new ConcurrentQueue<ForzaPacket>();
-
-        listener = new Thread(new ThreadStart(ListenPackets));
-        listener.IsBackground = true;
-        listener.Start();
+        StartNewPacketListener();
 	}
 
-    void Update()
+    void Update ()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             receivingUdpClient.Close();
             Debug.Log("Packet queue watcher stopped by user");
+        }
+        else if (Input.GetKeyDown(KeyCode.N))
+        {
+            receivingUdpClient.Close();
+            Debug.Log("Clearing. Starting new packet listener");
+
+            DataPoints.Reset();
+            visualizations.ResetVisualizations();
+            uiVisualizations.ResetUIVisualizations();
+
+            StartNewPacketListener();
         }
 
         if (listener.IsAlive || packetQueue.Count > 0)
@@ -50,7 +57,21 @@ public class ReadPCAP : MonoBehaviour {
         }
     }
 
-    void ListenPackets()
+    void StartNewPacketListener ()
+    {
+        packetQueue = new ConcurrentQueue<ForzaPacket>();
+
+        if (listener != null)
+        {
+            listener.Abort();
+        }
+
+        listener = new Thread(new ThreadStart(ListenPackets));
+        listener.IsBackground = true;
+        listener.Start();
+    }
+
+    void ListenPackets ()
     {
         receivingUdpClient = new UdpClient(listenPort);
         IPEndPoint RemoteIpEndPoint = new IPEndPoint(IPAddress.Any, 0);

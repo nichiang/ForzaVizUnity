@@ -10,54 +10,26 @@ public class Graph : MonoBehaviour
     public UILineRenderer uiLineRenderer;
     public int visiblePointsCount = 20;
 
-    private Queue<float> dataPoints;
+    private Queue<float> dataPoints = new Queue<float>();
     private float pointOffset;
 
     private float uiWidth;
     private float uiHeight;
 
     // Use this for initialization
-    void Start()
+    void Start ()
     {
-        dataPoints = new Queue<float>();
-
-        if (lineRenderer != null)
-        {
-            pointOffset = 2f / visiblePointsCount;
-            lineRenderer.positionCount = visiblePointsCount;
-
-            for (int i = 0; i < visiblePointsCount; i++)
-            {
-                dataPoints.Enqueue(0);
-                lineRenderer.SetPosition(i, new Vector3(i * pointOffset - 1f, 0, 0));
-            }
-        }
-        else if (uiLineRenderer != null)
-        {
-            pointOffset = 1f / visiblePointsCount;
-            uiLineRenderer.Points = new Vector2[visiblePointsCount];
-
-            uiWidth = uiLineRenderer.GetComponent<RectTransform>().rect.width;
-            uiHeight = uiLineRenderer.GetComponent<RectTransform>().rect.height;
-
-            for (int i = 0; i < visiblePointsCount; i++)
-            {
-                dataPoints.Enqueue(0);
-                uiLineRenderer.Points[i] = new Vector2(i * pointOffset * uiWidth, 0);
-            }
-
-            uiLineRenderer.Apply();
-        }
+        ResetGraph();
     }
 
     // Update is called once per frame
-    void Update()
+    void Update ()
     {
         if (lineRenderer != null)
             this.transform.forward = Camera.main.transform.forward;
     }
 
-    public void AddPoint(float point)
+    public void AddPoint (float point)
     {
         dataPoints.Enqueue(point);
 
@@ -90,7 +62,7 @@ public class Graph : MonoBehaviour
         }
     }
 
-    public void AddPoints(List<float> points)
+    public void AddPoints (List<float> points)
     {
         if (points.Count != visiblePointsCount)
             return;
@@ -120,6 +92,39 @@ public class Graph : MonoBehaviour
                 pointsEnum.MoveNext();
                 Vector3 newPoint = new Vector3((1f - i * pointOffset) * uiWidth, pointsEnum.Current * uiHeight);
                 uiLineRenderer.Points[i] = newPoint;
+            }
+
+            uiLineRenderer.Apply();
+        }
+    }
+
+    public void ResetGraph ()
+    {
+        dataPoints.Clear();
+
+        if (lineRenderer != null)
+        {
+            pointOffset = 2f / visiblePointsCount;
+            lineRenderer.positionCount = visiblePointsCount;
+
+            for (int i = 0; i < visiblePointsCount; i++)
+            {
+                dataPoints.Enqueue(0);
+                lineRenderer.SetPosition(i, new Vector3(i * pointOffset - 1f, 0, 0));
+            }
+        }
+        else if (uiLineRenderer != null)
+        {
+            pointOffset = 1f / visiblePointsCount;
+            uiLineRenderer.Points = new Vector2[visiblePointsCount];
+
+            uiWidth = uiLineRenderer.GetComponent<RectTransform>().rect.width;
+            uiHeight = uiLineRenderer.GetComponent<RectTransform>().rect.height;
+
+            for (int i = 0; i < visiblePointsCount; i++)
+            {
+                dataPoints.Enqueue(0);
+                uiLineRenderer.Points[i] = new Vector2(i * pointOffset * uiWidth, 0);
             }
 
             uiLineRenderer.Apply();

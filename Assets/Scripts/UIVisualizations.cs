@@ -30,4 +30,9 @@ public class UIVisualizations : MonoBehaviour {
 
         speed.text = Mathf.RoundToInt(packet.VelocityZ * 2.237f).ToString();
     }
+
+    public void ResetUIVisualizations ()
+    {
+        // placeholder
+    }
 }

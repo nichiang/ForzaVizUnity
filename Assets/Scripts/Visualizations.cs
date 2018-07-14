@@ -84,6 +84,10 @@ public class Visualizations : MonoBehaviour {
     private Transform FRDataPointsRoot;
     private Transform RLDataPointsRoot;
     private Transform RRDataPointsRoot;
+    private LineRenderer FLTractionLine;
+    private LineRenderer FRTractionLine;
+    private LineRenderer RLTractionLine;
+    private LineRenderer RRTractionLine;
 
     [Header("Misc References")]
     public Transform dataRoot;
@@ -127,6 +131,11 @@ public class Visualizations : MonoBehaviour {
         FRDataPointsRoot = FRCircle.transform.parent.GetChild(1);
         RLDataPointsRoot = RLCircle.transform.parent.GetChild(1);
         RRDataPointsRoot = RRCircle.transform.parent.GetChild(1);
+
+        FLTractionLine = FLDataPointsRoot.GetComponent<LineRenderer>();
+        FRTractionLine = FRDataPointsRoot.GetComponent<LineRenderer>();
+        RLTractionLine = RLDataPointsRoot.GetComponent<LineRenderer>();
+        RRTractionLine = RRDataPointsRoot.GetComponent<LineRenderer>();
     }
 
     void Update ()
@@ -367,11 +376,6 @@ public class Visualizations : MonoBehaviour {
         }
         else
         {
-            LineRenderer FLTractionLine = FLDataPointsRoot.GetComponent<LineRenderer>();
-            LineRenderer FRTractionLine = FRDataPointsRoot.GetComponent<LineRenderer>();
-            LineRenderer RLTractionLine = RLDataPointsRoot.GetComponent<LineRenderer>();
-            LineRenderer RRTractionLine = RRDataPointsRoot.GetComponent<LineRenderer>();
-
             FLTractionLine.positionCount = TractionCircleHistoryCount;
             FRTractionLine.positionCount = TractionCircleHistoryCount;
             RLTractionLine.positionCount = TractionCircleHistoryCount;
@@ -485,5 +489,63 @@ public class Visualizations : MonoBehaviour {
         Vector3 scaleArrow = arrow.transform.localScale;
         scaleArrow.z *= gforce;
         arrow.transform.localScale = scaleArrow;
+    }
+
+    public void ResetVisualizations ()
+    {
+        FLGraph.ResetGraph();
+        FRGraph.ResetGraph();
+        RLGraph.ResetGraph();
+        RRGraph.ResetGraph();
+
+        FLUiGraph.ResetGraph();
+        FRUiGraph.ResetGraph();
+        RLUiGraph.ResetGraph();
+        RRUiGraph.ResetGraph();
+
+        Vector2 resetTractionCircle = new Vector2(0.5f, 0.5f);
+        Vector3 resetTractionPointer = new Vector3(0.5f, 0, 0);
+
+        FLCircle.radius = resetTractionCircle;
+        FRCircle.radius = resetTractionCircle;
+        RLCircle.radius = resetTractionCircle;
+        RRCircle.radius = resetTractionCircle;
+
+        FLCircle.UpdateEllipse();
+        FRCircle.UpdateEllipse();
+        RLCircle.UpdateEllipse();
+        RRCircle.UpdateEllipse();
+
+        FLPointer.SetPosition(1, resetTractionPointer);
+        FRPointer.SetPosition(1, resetTractionPointer);
+        RLPointer.SetPosition(1, resetTractionPointer);
+        RRPointer.SetPosition(1, resetTractionPointer);
+
+        if (FLDataPointsRoot.childCount > 0)
+        {
+            for (int i = 0; i < TractionCircleHistoryCount; i++)
+            {
+                FLDataPointsRoot.GetChild(i).localPosition = Vector3.zero;
+                FRDataPointsRoot.GetChild(i).localPosition = Vector3.zero;
+                RLDataPointsRoot.GetChild(i).localPosition = Vector3.zero;
+                RRDataPointsRoot.GetChild(i).localPosition = Vector3.zero;
+            }
+        }
+
+        FLTractionLine.positionCount = 0;
+        FRTractionLine.positionCount = 0;
+        RLTractionLine.positionCount = 0;
+        RRTractionLine.positionCount = 0;
+
+        lineMeshVertices.Clear();
+        lineMeshTriangles.Clear();
+        lineMeshColours.Clear();
+
+        mainCamera.ResetCamera();
+
+        for (int i = dataRoot.childCount - 1; i >= 0; i--)
+        {
+            Destroy(dataRoot.GetChild(i).gameObject);
+        }
     }
 }
