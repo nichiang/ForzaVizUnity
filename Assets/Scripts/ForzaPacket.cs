@@ -77,6 +77,8 @@ public class ForzaPacket {
     public Int32 DrivetrainType { get; set; } //Corresponds to EDrivetrainType { get; set; } 0 = FWD, 1 = RWD, 2 = AWD
     public Int32 NumCylinders { get; set; } //Number of cylinders in the engine
 
+    public UInt32 LapNum = 0; //Custom value
+
     public ForzaPacket()
     {
 

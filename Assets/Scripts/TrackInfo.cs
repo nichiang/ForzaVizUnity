@@ -59,7 +59,7 @@ public class TrackInfo : MonoBehaviour {
         }
     }
 
-    public void FindLap (int packetIndex)
+    public int CheckNewLap (int packetIndex)
     {
         if (lapStartingPoints.Count == 0 && DataPoints.GetLatestPacketIndex() >= 0)
         {
@@ -89,5 +89,7 @@ public class TrackInfo : MonoBehaviour {
                 currentLapIndex += 1f;
             }
         }
+
+        return lapStartingPoints.Count;
     }
 }

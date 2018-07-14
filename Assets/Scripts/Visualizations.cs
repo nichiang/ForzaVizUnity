@@ -40,6 +40,7 @@ public class Visualizations : MonoBehaviour {
     [Header("Line Trail")]
     public float lineTrailWidth = 1f;
     public Material lineMaterial;
+    public Material lineMaterialInactive;
 
     [Header("G Force")]
     public Gradient gForceGradient;
@@ -96,7 +97,10 @@ public class Visualizations : MonoBehaviour {
 
     private MainCamera mainCamera;
     private TrackInfo trackInfo;
+    private int currentLapNum = 1;
+    private int currentTrackingLapNum = 1;
 
+    private List<Mesh> oldLapMeshes = new List<Mesh>();
     private List<Vector3> lineMeshVertices = new List<Vector3>();
     private List<int> lineMeshTriangles = new List<int>();
     private List<Color> lineMeshColours = new List<Color>();
@@ -142,16 +146,25 @@ public class Visualizations : MonoBehaviour {
     {
         if (lineMeshVertices.Count > 0)
         {
+            Material activeMat;
+
+            for (int i = 0; i < oldLapMeshes.Count; i++)
+            {
+                activeMat = i + 1 == currentTrackingLapNum ? lineMaterial : lineMaterialInactive;
+                Graphics.DrawMesh(oldLapMeshes[i], Matrix4x4.identity, activeMat, 0);
+            }
+
             Mesh lineMesh = new Mesh();
             lineMesh.SetVertices(lineMeshVertices);
             lineMesh.SetTriangles(lineMeshTriangles, 0);
             lineMesh.SetColors(lineMeshColours);
 
-            Graphics.DrawMesh(lineMesh, Matrix4x4.identity, lineMaterial, 0);
+            activeMat = currentLapNum == currentTrackingLapNum ? lineMaterial : lineMaterialInactive;
+            Graphics.DrawMesh(lineMesh, Matrix4x4.identity, activeMat, 0);
         }
     }
 
-    public void DrawVisualizations (DataPoint p)
+    public void DrawTrail (DataPoint p, int lapNum)
     {
         GameObject trailPrefab = genericTrailPrefab;
 
@@ -180,25 +193,25 @@ public class Visualizations : MonoBehaviour {
         {
             mainCamera.FollowCurrentPoint(DataPoints.GetLatestPacketIndex());
 
-            DrawCarVisualizations(p.GetPacket());
+            DrawVisualizations(p.GetPacket());
         }
 
         //ElevationViz(node);
 
         if (trailVisualizationType == TrailVizType.Line)
         {
-            LineTrailViz();
+            LineTrailViz(lapNum);
         }
         else if (trailVisualizationType == TrailVizType.GForce)
         {
             GForceViz(p.GetPacket(), node);
         }
-
-        trackInfo.FindLap(DataPoints.GetLatestPacketIndex());
     }
 
-    void DrawCarVisualizations (ForzaPacket packet)
+    void DrawVisualizations (ForzaPacket packet)
     {
+        currentTrackingLapNum = (int)packet.LapNum;
+
         if (onCarVizType == OnCarVizType.SuspensionTravel)
         {
             FLGraph.AddPoint(1f - packet.NormalizedSuspensionTravelFrontLeft);
@@ -219,9 +232,10 @@ public class Visualizations : MonoBehaviour {
         RRUiGraph.AddPoint(1f - packet.NormalizedSuspensionTravelRearRight);
     }
 
-    public void DrawCarVisualizationsAtIndex (int packetIndex)
+    public void DrawVisualizationsAtIndex (int packetIndex)
     {
-        ForzaPacket packet;
+        ForzaPacket packet = DataPoints.GetPoint(packetIndex).GetPacket();
+        currentTrackingLapNum = (int)packet.LapNum;
 
         List<float> FLSuspensionGraphPoints = new List<float>();
         List<float> FRSuspensionGraphPoints = new List<float>();
@@ -432,10 +446,26 @@ public class Visualizations : MonoBehaviour {
         }
     }
 
-    void LineTrailViz ()
+    void LineTrailViz (int lapNum)
     {
         if (DataPoints.GetLatestPacketIndex() <= 1)
             return;
+
+        if (currentLapNum != lapNum)
+        {
+            Mesh lineMesh = new Mesh();
+            lineMesh.SetVertices(lineMeshVertices);
+            lineMesh.SetTriangles(lineMeshTriangles, 0);
+            lineMesh.SetColors(lineMeshColours);
+
+            oldLapMeshes.Add(lineMesh);
+
+            lineMeshVertices.Clear();
+            lineMeshTriangles.Clear();
+            lineMeshColours.Clear();
+
+            currentLapNum = lapNum;
+        }
 
         float gforce = DataPoints.GetCurrentPoint().GetPacket().AccelerationZ / 9.80665f;
         Vector3 currPoint = DataPoints.GetCurrentPoint().GetPosition();
@@ -537,6 +567,7 @@ public class Visualizations : MonoBehaviour {
         RLTractionLine.positionCount = 0;
         RRTractionLine.positionCount = 0;
 
+        oldLapMeshes.Clear();
         lineMeshVertices.Clear();
         lineMeshTriangles.Clear();
         lineMeshColours.Clear();

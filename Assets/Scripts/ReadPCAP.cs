@@ -11,6 +11,7 @@ public class ReadPCAP : MonoBehaviour {
     public int listenPort = 51384;
     public Visualizations visualizations;
     public UIVisualizations uiVisualizations;
+    public TrackInfo trackInfo;
 
     private UdpClient receivingUdpClient;
     private ConcurrentQueue<ForzaPacket> packetQueue;
@@ -50,8 +51,10 @@ public class ReadPCAP : MonoBehaviour {
             if (packetQueue.TryDequeue(out packet))
             {
                 DataPoint newPoint = DataPoints.AddPoint(packet);
+                int lapNum = trackInfo.CheckNewLap(DataPoints.GetLatestPacketIndex());
 
-                visualizations.DrawVisualizations(newPoint);
+                newPoint.GetPacket().LapNum = (uint)lapNum;
+                visualizations.DrawTrail(newPoint, lapNum);
                 uiVisualizations.DrawUI(packet);
             }
         }

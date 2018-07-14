@@ -375,80 +375,6 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 51681628}
---- !u!21 &56412377
-Material:
-  serializedVersion: 6
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_Name: Elevation Line
-  m_Shader: {fileID: 4800000, guid: 0077a7ceef9b5d84eb7044ab1da5e282, type: 3}
-  m_ShaderKeywords: 
-  m_LightmapFlags: 5
-  m_EnableInstancingVariants: 0
-  m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
-  m_SavedProperties:
-    serializedVersion: 3
-    m_TexEnvs:
-    - _GlowTex:
-        m_Texture: {fileID: 2800000, guid: 5e53321c29155e244a94a606390b62b4, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _GlowTexEndCap:
-        m_Texture: {fileID: 2800000, guid: 77d11bbc2693a894daff6987aeb73dc8, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _GlowTexRoundJoin:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _GlowTexStartCap:
-        m_Texture: {fileID: 2800000, guid: 5d8643942d985534b870d1a888ddadb4, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 984a88b5a0185474eb0468cd87af1f61, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MainTexEndCap:
-        m_Texture: {fileID: 2800000, guid: 45c81bb47bd46a649a5dd5dc55773d7b, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MainTexRoundJoin:
-        m_Texture: {fileID: 2800000, guid: 3ca762c8af32c584b93a17bd8acda6ac, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MainTexStartCap:
-        m_Texture: {fileID: 2800000, guid: 28bc7251a89887c48bf15fd84c04668e, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Floats:
-    - _AnimationSpeed: 0
-    - _AnimationSpeedGlow: 0
-    - _CameraPixelHeight: 91
-    - _CameraTangent: 1.1547005
-    - _ElapsedSecondsOverride: 999999
-    - _GlowIntensityMultiplier: 0
-    - _GlowLengthMultiplier: 0
-    - _GlowWidthMultiplier: 0
-    - _InvFade: 1
-    - _JitterMultiplier: 0
-    - _OneOverCameraPixelHeight: 0.010989011
-    - _ScreenRadiusMultiplier: 0
-    - _Turbulence: 0
-    - _UVXScale: 1
-    - _UVXScaleGlow: 1
-    - _UVYScale: 1
-    - _UVYScaleGlow: 1
-    m_Colors:
-    - _CameraDownVector: {r: -0, g: -1, b: -0, a: 0}
-    - _CameraRightVector: {r: 1, g: 0, b: 0, a: 0}
-    - _GlowTintColor: {r: 0.9843137, g: 1, b: 0, a: 1}
-    - _TintColor: {r: 1, g: 1, b: 1, a: 1}
-    - _TurbulenceVelocity: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &114024057
 GameObject:
   m_ObjectHideFlags: 0
@@ -1381,80 +1307,6 @@ LineRenderer:
     generateLightingData: 0
   m_UseWorldSpace: 0
   m_Loop: 0
---- !u!21 &362624756
-Material:
-  serializedVersion: 6
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_Name: Elevation Line
-  m_Shader: {fileID: 4800000, guid: 0077a7ceef9b5d84eb7044ab1da5e282, type: 3}
-  m_ShaderKeywords: 
-  m_LightmapFlags: 5
-  m_EnableInstancingVariants: 0
-  m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
-  m_SavedProperties:
-    serializedVersion: 3
-    m_TexEnvs:
-    - _GlowTex:
-        m_Texture: {fileID: 2800000, guid: 5e53321c29155e244a94a606390b62b4, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _GlowTexEndCap:
-        m_Texture: {fileID: 2800000, guid: 77d11bbc2693a894daff6987aeb73dc8, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _GlowTexRoundJoin:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _GlowTexStartCap:
-        m_Texture: {fileID: 2800000, guid: 5d8643942d985534b870d1a888ddadb4, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 984a88b5a0185474eb0468cd87af1f61, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MainTexEndCap:
-        m_Texture: {fileID: 2800000, guid: 45c81bb47bd46a649a5dd5dc55773d7b, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MainTexRoundJoin:
-        m_Texture: {fileID: 2800000, guid: 3ca762c8af32c584b93a17bd8acda6ac, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MainTexStartCap:
-        m_Texture: {fileID: 2800000, guid: 28bc7251a89887c48bf15fd84c04668e, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Floats:
-    - _AnimationSpeed: 0
-    - _AnimationSpeedGlow: 0
-    - _CameraPixelHeight: 91
-    - _CameraTangent: 1.1547005
-    - _ElapsedSecondsOverride: 999999
-    - _GlowIntensityMultiplier: 0
-    - _GlowLengthMultiplier: 0
-    - _GlowWidthMultiplier: 0
-    - _InvFade: 1
-    - _JitterMultiplier: 0
-    - _OneOverCameraPixelHeight: 0.010989011
-    - _ScreenRadiusMultiplier: 0
-    - _Turbulence: 0
-    - _UVXScale: 1
-    - _UVXScaleGlow: 1
-    - _UVYScale: 1
-    - _UVYScaleGlow: 1
-    m_Colors:
-    - _CameraDownVector: {r: -0, g: -1, b: -0, a: 0}
-    - _CameraRightVector: {r: 1, g: 0, b: 0, a: 0}
-    - _GlowTintColor: {r: 0.9843137, g: 1, b: 0, a: 1}
-    - _TintColor: {r: 1, g: 1, b: 1, a: 1}
-    - _TurbulenceVelocity: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &390635741
 GameObject:
   m_ObjectHideFlags: 0
@@ -1963,7 +1815,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d745c13a99f8244cb610895d9558b2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Material: {fileID: 362624756}
+  Material: {fileID: 1869877966}
   CloneMaterial: 1
   Camera: {fileID: 1415663437}
   UseWorldSpace: 1
@@ -2379,6 +2231,80 @@ MonoBehaviour:
   width: 0.02
   rotationAngle: 0
   resolution: 50
+--- !u!21 &685423904
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: Elevation Line
+  m_Shader: {fileID: 4800000, guid: 0077a7ceef9b5d84eb7044ab1da5e282, type: 3}
+  m_ShaderKeywords: 
+  m_LightmapFlags: 5
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _GlowTex:
+        m_Texture: {fileID: 2800000, guid: 5e53321c29155e244a94a606390b62b4, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _GlowTexEndCap:
+        m_Texture: {fileID: 2800000, guid: 77d11bbc2693a894daff6987aeb73dc8, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _GlowTexRoundJoin:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _GlowTexStartCap:
+        m_Texture: {fileID: 2800000, guid: 5d8643942d985534b870d1a888ddadb4, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 2800000, guid: 984a88b5a0185474eb0468cd87af1f61, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTexEndCap:
+        m_Texture: {fileID: 2800000, guid: 45c81bb47bd46a649a5dd5dc55773d7b, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTexRoundJoin:
+        m_Texture: {fileID: 2800000, guid: 3ca762c8af32c584b93a17bd8acda6ac, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTexStartCap:
+        m_Texture: {fileID: 2800000, guid: 28bc7251a89887c48bf15fd84c04668e, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - _AnimationSpeed: 0
+    - _AnimationSpeedGlow: 0
+    - _CameraPixelHeight: 91
+    - _CameraTangent: 1.1547005
+    - _ElapsedSecondsOverride: 999999
+    - _GlowIntensityMultiplier: 0
+    - _GlowLengthMultiplier: 0
+    - _GlowWidthMultiplier: 0
+    - _InvFade: 1
+    - _JitterMultiplier: 0
+    - _OneOverCameraPixelHeight: 0.010989011
+    - _ScreenRadiusMultiplier: 0
+    - _Turbulence: 0
+    - _UVXScale: 1
+    - _UVXScaleGlow: 1
+    - _UVYScale: 1
+    - _UVYScaleGlow: 1
+    m_Colors:
+    - _CameraDownVector: {r: -0, g: -1, b: -0, a: 0}
+    - _CameraRightVector: {r: 1, g: 0, b: 0, a: 0}
+    - _GlowTintColor: {r: 0.9843137, g: 1, b: 0, a: 1}
+    - _TintColor: {r: 1, g: 1, b: 1, a: 1}
+    - _TurbulenceVelocity: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &721251981
 GameObject:
   m_ObjectHideFlags: 0
@@ -2888,6 +2814,8 @@ MonoBehaviour:
   suspensionGraphVisiblePoints: 100
   lineTrailWidth: 1
   lineMaterial: {fileID: 2100000, guid: 03f80f1e5c68d0c49a0b665c21f03bc5, type: 2}
+  lineMaterialInactive: {fileID: 2100000, guid: 7dd92e4da4d038742896fb9574baddd8,
+    type: 2}
   gForceGradient:
     serializedVersion: 2
     key0: {r: 0.718, g: 0.19960399, b: 0.19960399, a: 1}
@@ -3153,7 +3081,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d745c13a99f8244cb610895d9558b2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Material: {fileID: 56412377}
+  Material: {fileID: 685423904}
   CloneMaterial: 1
   Camera: {fileID: 1415663437}
   UseWorldSpace: 1
@@ -5530,6 +5458,7 @@ MonoBehaviour:
   listenPort: 51384
   visualizations: {fileID: 875308974}
   uiVisualizations: {fileID: 1949984210}
+  trackInfo: {fileID: 875308975}
 --- !u!4 &1826372310
 Transform:
   m_ObjectHideFlags: 0
@@ -5617,6 +5546,80 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1850252233}
+--- !u!21 &1869877966
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: Elevation Line
+  m_Shader: {fileID: 4800000, guid: 0077a7ceef9b5d84eb7044ab1da5e282, type: 3}
+  m_ShaderKeywords: 
+  m_LightmapFlags: 5
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _GlowTex:
+        m_Texture: {fileID: 2800000, guid: 5e53321c29155e244a94a606390b62b4, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _GlowTexEndCap:
+        m_Texture: {fileID: 2800000, guid: 77d11bbc2693a894daff6987aeb73dc8, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _GlowTexRoundJoin:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _GlowTexStartCap:
+        m_Texture: {fileID: 2800000, guid: 5d8643942d985534b870d1a888ddadb4, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 2800000, guid: 984a88b5a0185474eb0468cd87af1f61, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTexEndCap:
+        m_Texture: {fileID: 2800000, guid: 45c81bb47bd46a649a5dd5dc55773d7b, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTexRoundJoin:
+        m_Texture: {fileID: 2800000, guid: 3ca762c8af32c584b93a17bd8acda6ac, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTexStartCap:
+        m_Texture: {fileID: 2800000, guid: 28bc7251a89887c48bf15fd84c04668e, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - _AnimationSpeed: 0
+    - _AnimationSpeedGlow: 0
+    - _CameraPixelHeight: 91
+    - _CameraTangent: 1.1547005
+    - _ElapsedSecondsOverride: 999999
+    - _GlowIntensityMultiplier: 0
+    - _GlowLengthMultiplier: 0
+    - _GlowWidthMultiplier: 0
+    - _InvFade: 1
+    - _JitterMultiplier: 0
+    - _OneOverCameraPixelHeight: 0.010989011
+    - _ScreenRadiusMultiplier: 0
+    - _Turbulence: 0
+    - _UVXScale: 1
+    - _UVXScaleGlow: 1
+    - _UVYScale: 1
+    - _UVYScaleGlow: 1
+    m_Colors:
+    - _CameraDownVector: {r: -0, g: -1, b: -0, a: 0}
+    - _CameraRightVector: {r: 1, g: 0, b: 0, a: 0}
+    - _GlowTintColor: {r: 0.9843137, g: 1, b: 0, a: 1}
+    - _TintColor: {r: 1, g: 1, b: 1, a: 1}
+    - _TurbulenceVelocity: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &1878608012
 GameObject:
   m_ObjectHideFlags: 0

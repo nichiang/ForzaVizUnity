@@ -33,6 +33,6 @@ public class UIVisualizations : MonoBehaviour {
 
     public void ResetUIVisualizations ()
     {
-        // placeholder
+        speed.text = "000";
     }
 }

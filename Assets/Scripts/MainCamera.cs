@@ -43,7 +43,7 @@ public class MainCamera : MonoBehaviour {
                     followMode = false;
 
                     FollowCurrentPoint(prevIndex, true, Direction.backward);
-                    visualizations.DrawCarVisualizationsAtIndex(prevIndex);
+                    visualizations.DrawVisualizationsAtIndex(prevIndex);
                     uiVisualizations.DrawUIAtIndex(prevIndex);
                 }
 
@@ -67,7 +67,7 @@ public class MainCamera : MonoBehaviour {
                     followMode = false;
 
                     FollowCurrentPoint(nextIndex, true, Direction.forward);
-                    visualizations.DrawCarVisualizationsAtIndex(nextIndex);
+                    visualizations.DrawVisualizationsAtIndex(nextIndex);
                     uiVisualizations.DrawUIAtIndex(nextIndex);
                 }
 
@@ -87,7 +87,7 @@ public class MainCamera : MonoBehaviour {
             if (followMode)
             {
                 int currentIndex = DataPoints.GetLatestPacketIndex();
-                visualizations.DrawCarVisualizationsAtIndex(currentIndex);
+                visualizations.DrawVisualizationsAtIndex(currentIndex);
                 uiVisualizations.DrawUIAtIndex(currentIndex);
                 visualizations.ShowElevationLines(true);
             }
