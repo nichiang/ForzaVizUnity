@@ -10,12 +10,14 @@ public class DataPoints : MonoBehaviour {
     static float lastTimestamp = 0;
     static float frameTick = 0;
 
+    static double timestampTotal = 0;
+
     public static DataPoint AddPoint (ForzaPacket packet)
     {
         if (lastTimestamp == 0)
         {
             lastPosition = new Vector3(0, 0, 0);
-            lastTimestamp = packet.TimestampMS - 16; // 16 represents one frame at 60 fps, which is the rate FM7 feeds the datastream at
+            lastTimestamp = packet.TimestampMS - 16; // 16 ms represents one frame at 60 fps, which is the rate FM7 feeds the datastream at
         }
 
         frameTick = (packet.TimestampMS - lastTimestamp) / 1000f;
@@ -31,6 +33,9 @@ public class DataPoints : MonoBehaviour {
         DataPoint newPoint = new DataPoint(packet, newPosition, newRotation);
         
         allPoints.Add(newPoint);
+
+        timestampTotal += packet.TimestampMS - lastTimestamp;
+        DebugConsole.Write("Packet frame time average: " + (timestampTotal / allPoints.Count));
 
         lastPosition = newPosition;
         lastTimestamp = packet.TimestampMS;

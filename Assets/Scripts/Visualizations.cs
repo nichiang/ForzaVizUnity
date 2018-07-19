@@ -90,6 +90,11 @@ public class Visualizations : MonoBehaviour {
     private LineRenderer RLTractionLine;
     private LineRenderer RRTractionLine;
 
+    [Header("Ghost References")]
+    public GameObject ghostMarkerPrefab;
+    public Transform ghostMarkersRoot;
+    private List<GhostMarker> ghostMarkers = new List<GhostMarker>();
+
     [Header("Misc References")]
     public Transform dataRoot;
     public GameObject graphAnchor;
@@ -230,6 +235,8 @@ public class Visualizations : MonoBehaviour {
         FRUiGraph.AddPoint(1f - packet.NormalizedSuspensionTravelFrontRight);
         RLUiGraph.AddPoint(1f - packet.NormalizedSuspensionTravelRearLeft);
         RRUiGraph.AddPoint(1f - packet.NormalizedSuspensionTravelRearRight);
+
+        GhostPositionViz();
     }
 
     public void DrawVisualizationsAtIndex (int packetIndex)
@@ -408,6 +415,54 @@ public class Visualizations : MonoBehaviour {
                 }
 
                 childIndex++;
+            }
+        }
+    }
+
+    void GhostPositionViz ()
+    {
+        int currentLap = trackInfo.CurrentLap();
+
+        if (ghostMarkers.Count < currentLap)
+        {
+            GameObject go = Instantiate(ghostMarkerPrefab, Vector3.zero, Quaternion.identity, ghostMarkersRoot);
+            GhostMarker marker = go.GetComponent<GhostMarker>();
+            marker.markerText.text = "LAP " + currentLap;
+            ghostMarkers.Add(marker);
+        }
+
+        for (int i = 0; i < ghostMarkers.Count; i++)
+        {
+            int positionIndex = trackInfo.GetGhostPosition(i);
+
+            if (DataPoints.IsValidIndex(positionIndex))
+            {
+                Vector3 pos = DataPoints.GetPoint(positionIndex).GetPosition();
+                ghostMarkers[i].transform.position = pos;
+            }
+
+            ghostMarkers[i].gameObject.SetActive(i + 1 != currentLap);
+        }
+    }
+
+    void GhostPositionVizAtIndex (int packetIndex)
+    {
+        List<int> ghostIndices = trackInfo.GetGhostPositionsAtIndex(packetIndex);
+
+        for (int i = 0; i < ghostMarkers.Count; i++)
+        {
+            if (DataPoints.IsValidIndex(ghostIndices[i]))
+            {
+                DataPoint indexPoint = DataPoints.GetPoint(ghostIndices[i]);
+
+                Vector3 pos = indexPoint.GetPosition();
+                ghostMarkers[i].transform.position = pos;
+
+                ghostMarkers[i].gameObject.SetActive(i + 1 != indexPoint.GetPacket().LapNum);
+            }
+            else
+            {
+                ghostMarkers[i].gameObject.SetActive(false);
             }
         }
     }

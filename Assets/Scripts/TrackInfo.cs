@@ -92,4 +92,44 @@ public class TrackInfo : MonoBehaviour {
 
         return lapStartingPoints.Count;
     }
+
+    // lapNum is zero index
+    public int GetGhostPosition (int lapNum)
+    {
+        if (lapNum < 0 || lapNum >= lapStartingPoints.Count)
+        {
+            return -1;
+        }
+        else
+        {
+            return lapStartingPoints[lapNum] + DataPoints.GetLatestPacketIndex() - lapStartingPoints[lapStartingPoints.Count - 1];
+        }
+    }
+
+    public List<int> GetGhostPositionsAtIndex (int index)
+    {
+        List<int> indices = new List<int>();
+        int indexLap = (int)DataPoints.GetPoint(index).GetPacket().LapNum;
+
+        for (int i = 0; i < lapStartingPoints.Count; i++)
+        {
+            if (i == indexLap)
+            {
+                indices.Add(index);
+            }
+            else
+            {
+                int position = lapStartingPoints[i] + index - lapStartingPoints[indexLap];
+
+                indices.Add(DataPoints.IsValidIndex(position) ? position : -1);
+            }
+        }
+
+        return indices;
+    }
+
+    public int CurrentLap ()
+    {
+        return lapStartingPoints.Count;
+    }
 }

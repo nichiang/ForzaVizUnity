@@ -51,9 +51,10 @@ public class ReadPCAP : MonoBehaviour {
             if (packetQueue.TryDequeue(out packet))
             {
                 DataPoint newPoint = DataPoints.AddPoint(packet);
-                int lapNum = trackInfo.CheckNewLap(DataPoints.GetLatestPacketIndex());
 
+                int lapNum = trackInfo.CheckNewLap(DataPoints.GetLatestPacketIndex());
                 newPoint.GetPacket().LapNum = (uint)lapNum;
+
                 visualizations.DrawTrail(newPoint, lapNum);
                 uiVisualizations.DrawUI(packet);
             }
