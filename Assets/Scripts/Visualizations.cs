@@ -169,7 +169,7 @@ public class Visualizations : MonoBehaviour {
         }
     }
 
-    public void DrawTrail (DataPoint p, int lapNum)
+    public void DrawTrail (DataPoint p, int lapNum, bool loadFromFile = false)
     {
         GameObject trailPrefab = genericTrailPrefab;
 
@@ -194,7 +194,7 @@ public class Visualizations : MonoBehaviour {
         if (!ShowElevation)
             node.transform.position = new Vector3(node.transform.position.x, 0, node.transform.position.z);
 
-        if (mainCamera.IsFollowing())
+        if (mainCamera.IsFollowing() && !loadFromFile)
         {
             mainCamera.FollowCurrentPoint(DataPoints.GetLatestPacketIndex());
 
@@ -319,9 +319,9 @@ public class Visualizations : MonoBehaviour {
         RLPointer.SetPosition(1, new Vector3(packet.TireSlipAngleRearLeft, packet.TireSlipRatioRearLeft, 0) / 2f);
         RRPointer.SetPosition(1, new Vector3(packet.TireSlipAngleRearRight, packet.TireSlipRatioRearRight, 0) / 2f);
 
-        if (ShowTractionCircleHistory)
+        if (ShowTractionCircleHistory && packetIndex > -1)
         {
-            if (DataPoints.GetLatestPacketIndex() % TractionCircleHistoryDensity == 0) // Run every n-th time
+            if (packetIndex % TractionCircleHistoryDensity == 0) // Run every n-th time
                 DrawTractionCircleHistory(packetIndex);
         }
     }

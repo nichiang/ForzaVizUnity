@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System.IO;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -107,5 +108,81 @@ public class DataPoints : MonoBehaviour {
         result.y = (float)((num7 + num12) * x + (1f - (num4 + num6)) * y + (num9 - num10) * z);
         result.z = (float)((num8 - num11) * x + (num9 + num10) * y + (1f - (num4 + num5)) * z);
         return result;
+    }
+
+    public static void SaveCSV (string path)
+    {
+        if (allPoints.Count == 0)
+            return;
+
+        StreamWriter file = new StreamWriter(path, false);
+
+        foreach (DataPoint datapoint in allPoints)
+        {
+            ForzaPacket p = datapoint.GetPacket();
+
+            file.WriteLine(
+                p.IsRaceOn + "," +
+                p.TimestampMS + "," +
+                p.EngineMaxRpm + "," +
+                p.EngineIdleRpm + "," +
+                p.CurrentEngineRpm + "," +
+                p.AccelerationX + "," +
+                p.AccelerationY + "," +
+                p.AccelerationZ + "," +
+                p.VelocityX + "," +
+                p.VelocityY + "," +
+                p.VelocityZ + "," +
+                p.AngularVelocityX + "," +
+                p.AngularVelocityY + "," +
+                p.AngularVelocityZ + "," +
+                p.Yaw + "," +
+                p.Pitch + "," +
+                p.Roll + "," +
+                p.NormalizedSuspensionTravelFrontLeft + "," +
+                p.NormalizedSuspensionTravelFrontRight + "," +
+                p.NormalizedSuspensionTravelRearLeft + "," +
+                p.NormalizedSuspensionTravelRearRight + "," +
+                p.TireSlipRatioFrontLeft + "," +
+                p.TireSlipRatioFrontRight + "," +
+                p.TireSlipRatioRearLeft + "," +
+                p.TireSlipRatioRearRight + "," +
+                p.WheelRotationSpeedFrontLeft + "," +
+                p.WheelRotationSpeedFrontRight + "," +
+                p.WheelRotationSpeedRearLeft + "," +
+                p.WheelRotationSpeedRearRight + "," +
+                p.WheelOnRumbleStripFrontLeft + "," +
+                p.WheelOnRumbleStripFrontRight + "," +
+                p.WheelOnRumbleStripRearLeft + "," +
+                p.WheelOnRumbleStripRearRight + "," +
+                p.WheelInPuddleDepthFrontLeft + "," +
+                p.WheelInPuddleDepthFrontRight + "," +
+                p.WheelInPuddleDepthRearLeft + "," +
+                p.WheelInPuddleDepthRearRight + "," +
+                p.SurfaceRumbleFrontLeft + "," +
+                p.SurfaceRumbleFrontRight + "," +
+                p.SurfaceRumbleRearLeft + "," +
+                p.SurfaceRumbleRearRight + "," +
+                p.TireSlipAngleFrontLeft + "," +
+                p.TireSlipAngleFrontRight + "," +
+                p.TireSlipAngleRearLeft + "," +
+                p.TireSlipAngleRearRight + "," +
+                p.TireCombinedSlipFrontLeft + "," +
+                p.TireCombinedSlipFrontRight + "," +
+                p.TireCombinedSlipRearLeft + "," +
+                p.TireCombinedSlipRearRight + "," +
+                p.SuspensionTravelMetersFrontLeft + "," +
+                p.SuspensionTravelMetersFrontRight + "," +
+                p.SuspensionTravelMetersRearLeft + "," +
+                p.SuspensionTravelMetersRearRight + "," +
+                p.CarOrdinal + "," +
+                p.CarClass + "," +
+                p.CarPerformanceIndex + "," +
+                p.DrivetrainType + "," +
+                p.NumCylinders
+            );
+        }
+
+        file.Close();
     }
 }

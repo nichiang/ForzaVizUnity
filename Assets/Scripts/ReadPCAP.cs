@@ -1,10 +1,11 @@
 ﻿using System;
+using System.IO;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;
 using UnityEngine;
+using Crosstales.FB;
 
 public class ReadPCAP : MonoBehaviour {
 
@@ -20,8 +21,12 @@ public class ReadPCAP : MonoBehaviour {
     private Thread listener;
     private UInt32 lastTimestamp = 0;
 
+    private string lastSavePath;
+
     // Use this for initialization
 	void Start () {
+        lastSavePath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+
         StartNewPacketListener();
 	}
 
@@ -34,14 +39,7 @@ public class ReadPCAP : MonoBehaviour {
         }
         else if (Input.GetKeyDown(KeyCode.N))
         {
-            receivingUdpClient.Close();
-            Debug.Log("Clearing. Starting new packet listener");
-
-            DataPoints.Reset();
-            visualizations.ResetVisualizations();
-            uiVisualizations.ResetUIVisualizations();
-
-            StartNewPacketListener();
+            NewCapture();
         }
 
         if (listener.IsAlive || packetQueue.Count > 0)
@@ -211,5 +209,144 @@ public class ReadPCAP : MonoBehaviour {
         receivingUdpClient.Close();
 
         Debug.Log("Packet queue watcher stopped");
+    }
+
+    public void NewCapture ()
+    {
+        receivingUdpClient.Close();
+        Debug.Log("Clearing. Starting new packet listener");
+
+        DataPoints.Reset();
+        visualizations.ResetVisualizations();
+        uiVisualizations.ResetUIVisualizations();
+
+        StartNewPacketListener();
+    }
+
+    public void LoadCSV ()
+    {
+        receivingUdpClient.Close();
+
+        string path = FileBrowser.OpenSingleFile("Open CSV", lastSavePath, "csv");
+
+        if (path != "")
+        {
+            Debug.Log("Reading packet info from " + path);
+
+            visualizations.ResetVisualizations();
+            uiVisualizations.ResetUIVisualizations();
+
+            using (StreamReader reader = new StreamReader(path))
+            {
+                while (!reader.EndOfStream)
+                {
+                    string line = reader.ReadLine();
+                    string[] values = line.Split(',');
+
+                    ForzaPacket p = new ForzaPacket
+                    {
+                        IsRaceOn = int.Parse(values[0]),
+                        TimestampMS = uint.Parse(values[1]),
+                        EngineMaxRpm = float.Parse(values[2]),
+                        EngineIdleRpm = float.Parse(values[3]),
+                        CurrentEngineRpm = float.Parse(values[4]),
+                        AccelerationX = float.Parse(values[5]),
+                        AccelerationY = float.Parse(values[6]),
+                        AccelerationZ = float.Parse(values[7]),
+                        VelocityX = float.Parse(values[8]),
+                        VelocityY = float.Parse(values[9]),
+                        VelocityZ = float.Parse(values[10]),
+                        AngularVelocityX = float.Parse(values[11]),
+                        AngularVelocityY = float.Parse(values[12]),
+                        AngularVelocityZ = float.Parse(values[13]),
+                        Yaw = float.Parse(values[14]),
+                        Pitch = float.Parse(values[15]),
+                        Roll = float.Parse(values[16]),
+                        NormalizedSuspensionTravelFrontLeft = float.Parse(values[17]),
+                        NormalizedSuspensionTravelFrontRight = float.Parse(values[18]),
+                        NormalizedSuspensionTravelRearLeft = float.Parse(values[19]),
+                        NormalizedSuspensionTravelRearRight = float.Parse(values[20]),
+                        TireSlipRatioFrontLeft = float.Parse(values[21]),
+                        TireSlipRatioFrontRight = float.Parse(values[22]),
+                        TireSlipRatioRearLeft = float.Parse(values[23]),
+                        TireSlipRatioRearRight = float.Parse(values[24]),
+                        WheelRotationSpeedFrontLeft = float.Parse(values[25]),
+                        WheelRotationSpeedFrontRight = float.Parse(values[26]),
+                        WheelRotationSpeedRearLeft = float.Parse(values[27]),
+                        WheelRotationSpeedRearRight = float.Parse(values[28]),
+                        WheelOnRumbleStripFrontLeft = int.Parse(values[29]),
+                        WheelOnRumbleStripFrontRight = int.Parse(values[30]),
+                        WheelOnRumbleStripRearLeft = int.Parse(values[31]),
+                        WheelOnRumbleStripRearRight = int.Parse(values[32]),
+                        WheelInPuddleDepthFrontLeft = float.Parse(values[33]),
+                        WheelInPuddleDepthFrontRight = float.Parse(values[34]),
+                        WheelInPuddleDepthRearLeft = float.Parse(values[35]),
+                        WheelInPuddleDepthRearRight = float.Parse(values[36]),
+                        SurfaceRumbleFrontLeft = float.Parse(values[37]),
+                        SurfaceRumbleFrontRight = float.Parse(values[38]),
+                        SurfaceRumbleRearLeft = float.Parse(values[39]),
+                        SurfaceRumbleRearRight = float.Parse(values[40]),
+                        TireSlipAngleFrontLeft = float.Parse(values[41]),
+                        TireSlipAngleFrontRight = float.Parse(values[42]),
+                        TireSlipAngleRearLeft = float.Parse(values[43]),
+                        TireSlipAngleRearRight = float.Parse(values[44]),
+                        TireCombinedSlipFrontLeft = float.Parse(values[45]),
+                        TireCombinedSlipFrontRight = float.Parse(values[46]),
+                        TireCombinedSlipRearLeft = float.Parse(values[47]),
+                        TireCombinedSlipRearRight = float.Parse(values[48]),
+                        SuspensionTravelMetersFrontLeft = float.Parse(values[49]),
+                        SuspensionTravelMetersFrontRight = float.Parse(values[50]),
+                        SuspensionTravelMetersRearLeft = float.Parse(values[51]),
+                        SuspensionTravelMetersRearRight = float.Parse(values[52]),
+                        CarOrdinal = int.Parse(values[53]),
+                        CarClass = int.Parse(values[54]),
+                        CarPerformanceIndex = int.Parse(values[55]),
+                        DrivetrainType = int.Parse(values[56]),
+                        NumCylinders = int.Parse(values[57])
+                    };
+
+                    if (p.TimestampMS == lastTimestamp)
+                    {
+                        Debug.Log("Same packet received, dropping.");
+                        continue;
+                    }
+                    else
+                    {
+                        lastTimestamp = p.TimestampMS;
+                    }
+
+                    DataPoint datapoint = DataPoints.AddPoint(p);
+
+                    int lapNum = trackInfo.CheckNewLap(DataPoints.GetLatestPacketIndex());
+                    p.LapNum = (uint)lapNum;
+
+                    visualizations.DrawTrail(datapoint, lapNum, true);
+                }
+
+                reader.Close();
+
+                Debug.Log("Read complete");
+            }
+
+            MainCamera mainCamera = Camera.main.GetComponent<MainCamera>();
+            mainCamera.GoToPoint(0);
+        }
+    }
+
+    public void SaveCSV ()
+    {
+        receivingUdpClient.Close();
+
+        string path = FileBrowser.SaveFile("Save CSV", lastSavePath, "output", "csv");
+
+        if (path != "")
+        {
+            Debug.Log("Saving packet info to " + path);
+
+            DataPoints.SaveCSV(path);
+            lastSavePath = Path.GetDirectoryName(path);
+
+            Debug.Log("Save complete");
+        }
     }
 }

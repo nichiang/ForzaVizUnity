@@ -7,12 +7,12 @@ Material:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_Name: Line Trail
-  m_Shader: {fileID: 4800000, guid: 62686c78a133ee34abb3df7207c63df5, type: 3}
+  m_Shader: {fileID: 4800000, guid: 022d1eedf2779ad4ea488f09d0ea532e, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
+  m_CustomRenderQueue: 2000
   stringTagMap: {}
   disabledShaderPasses: []
   m_SavedProperties:
